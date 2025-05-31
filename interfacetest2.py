@@ -50,10 +50,10 @@ def clique():
 
 # Função para mostrar/ocultar a senha
 imagem = Image.open("olho_aberto.png")
-imagem_olho_a = ctk.CTkImage(light_image=imagem,dark_image=imagem, size=(50,50))
+imagem_olho_a = ctk.CTkImage(light_image=imagem,dark_image=imagem, size=(25,25))
 
 imagem = Image.open("olho_fechado.png")
-imagem_olho_f = ctk.CTkImage(light_image=imagem,dark_image=imagem, size=(50,50))
+imagem_olho_f = ctk.CTkImage(light_image=imagem,dark_image=imagem, size=(25,25))
 
 def alternar_senha():
     global mostrar
@@ -107,89 +107,85 @@ def vericar():
 
 janela = ctk.CTk()
 janela.title("login/Aula do dia 27/05/2025")
-#janela.resizable(False,False)
-janela.geometry("1000x800")
-#janela.minsize(400,400)
-#janela.maxsize(800,800)
+janela.resizable(False,False)
+janela.geometry("700x500")
+#janela.minsize(400,300)
+#janela.maxsize(400,300)
 
 #frame1
 frame1=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
-frame1.grid(row=0, column=0,columnspan=7, padx=10, pady=10,sticky="nsew")
+frame1.grid(row=0, column=0, padx=10, pady=10,sticky="nsew")
 
 imagem = Image.open("logo.png")
 imagem_ctk = ctk.CTkImage(light_image=imagem,dark_image=imagem, size=(100,100))
 
-label_imagem=ctk.CTkLabel(frame1, image=imagem_ctk, text="")
-label_imagem.grid(row =0, column=0, pady=10,sticky="")
-
-label = ctk.CTkLabel(frame1, text="Bem vindo ao programa de teste:", text_color="white", font=("Arial", 30, "bold"))
-label.grid(row=0, column=0, columnspan=7, pady=20, padx=20, sticky="")
-
+label_imagem=ctk.CTkLabel(master=frame1, image=imagem_ctk, text="")
+label_imagem.grid(row =0, column=0,padx=10, pady=10,sticky="ew")
 
 #frame2
 frame2=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
-frame2.grid(row=0, column=1, padx=10, pady=10,sticky="nsew")
+frame2.grid(row=0, column=1, columnspan=7, padx=10, pady=10,sticky="ew")
 
-label1 = ctk.CTkLabel(janela,text="Usuario:")
-label1.grid(row = 2, column = 1, pady=(10,1), padx=(10),stick="w")
-
-entry1 = ctk.CTkEntry(janela,placeholder_text="digite seu Usuario:")
-entry1.grid(row = 2, column = 2, pady=(10,1), padx=(10),stick="nsew")
-
-label2 = ctk.CTkLabel(janela,text="Senha:")
-label2.grid(row = 2, column = 3, pady=(10,1), padx=(10),stick="w")
-
-entry2 = ctk.CTkEntry(janela,placeholder_text="digite sua senha:", show = "*")
-entry2.grid(row = 2, column = 4, pady=(10,1), padx=(10),stick="nsew")
-
-botao_mostrar = ctk.CTkButton(janela, command=alternar_senha,text="", image=imagem_olho_f,width=50,height=50,fg_color="grey",hover_color="grey",corner_radius=10)
-botao_mostrar.grid(row = 2, column = 5, pady=(10,1), padx=(10),stick="nsew")
-
-
-botao = ctk.CTkButton(janela,text="Entre", command=vai_la)
-botao.grid(row = 2, column = 6, pady=(10,1), padx=(10),stick="nsew")
-
-label3 = ctk.CTkLabel(janela, text="")
-label3.grid(row = 3, column = 0, pady=(10,1), padx=(10),stick="nsew")
+label = ctk.CTkLabel(master=frame2,text="Bem vindo ao programa de teste:",text_color="white",font=("Arial", 30, "bold"),justify="center")
+label.grid(row=0, column=0,columnspan=7, padx=10, pady=10, sticky="ew")
 
 #frame3
 frame3=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
-frame3.grid(row=1, column=6, padx=10, pady=10,sticky="nsew")
+frame3.grid(row=2, column=0,columnspan=7, padx=10, pady=10,sticky="")
+
+label1 = ctk.CTkLabel(master=frame3,text="Usuario:")
+label1.grid(row = 0, column = 0, pady=(10,1), padx=(10),stick="w")
+
+entry1 = ctk.CTkEntry(master=frame3,placeholder_text="digite seu Usuario:")
+entry1.grid(row = 0, column = 1, pady=(10,1), padx=(10),stick="nsew")
+
+label2 = ctk.CTkLabel(master=frame3,text="Senha:")
+label2.grid(row = 1, column = 0, pady=(10,1), padx=(10),stick="w")
+
+entry2 = ctk.CTkEntry(master=frame3,placeholder_text="digite sua senha:", show = "*")
+entry2.grid(row = 1, column = 1, pady=(10,1), padx=(10),stick="nsew")
+
+botao_mostrar = ctk.CTkButton(master=frame3, command=alternar_senha,text="", image=imagem_olho_f,width=25,height=25,fg_color="grey",hover_color="grey",corner_radius=10)
+botao_mostrar.grid(row = 1, column = 2, pady=(10,1), padx=(10),stick="nsew")
+
+#frame4
+
+frame4=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
+frame4.grid(row=3, column=0, columnspan=7, padx=10, pady=10,sticky="")
+
+botao = ctk.CTkButton(master=frame4,text="Entre", command=vai_la)
+botao.grid(row = 0, column = 0, pady=(10,1), padx=(10),stick="nsew")
+
+label3 = ctk.CTkLabel(master=frame4, text="")
+label3.grid(row = 1, column = 0, pady=(10,1), padx=(10),stick="nsew")
 
 
-
-botao = ctk.CTkButton(janela, text="Mostrar Alerta", command=alerta)
+"""botao = ctk.CTkButton(master=frame4, text="Mostrar Alerta", command=alerta)
 botao.grid(row = 4, column = 0, pady=(10), padx=(10),stick="")
 
 
-botao = ctk.CTkButton(janela,text="nova janela", font=("Arial",20,"bold"), command=clique)
+botao = ctk.CTkButton(master=frame4,text="nova janela", font=("Arial",20,"bold"), command=clique)
 botao.grid(row = 5, column = 0, pady=(10,1), padx=(10),stick="nsew")
 
 
 var = ctk.IntVar()
-check = ctk.CTkCheckBox(janela, text="Não sou um robo", variable=var)
+check = ctk.CTkCheckBox(master=frame4, text="Não sou um robo", variable=var)
 check.grid(row = 6, column = 0, pady=(10,1), padx=(10),stick="nsew")
 
 
-botao=ctk.CTkButton(janela,text="verificar", command=vericar)
-botao.grid(row = 7, column = 0, pady=(10,1), padx=(10),stick="nsew")
+botao=ctk.CTkButton(master=frame4,text="verificar", command=vericar)
+botao.grid(row = 7, column = 0, pady=(10,1), padx=(10),stick="nsew")"""
 
 
-botao = ctk.CTkButton(janela,text="Fechar", command=janela.destroy)
-botao.grid(row = 8, column = 0, pady=(10,1), padx=(10),stick="nsew")
+botao = ctk.CTkButton(master=frame4,text="Fechar", command=janela.destroy)
+botao.grid(row = 2, column = 0,columnspan=7, pady=(10,1), padx=(10),stick="nsew")
 
 
-
-
-
-
-
-
-frame4=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
+'''frame4=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
 frame4.grid(row=0, column=2, padx=10, pady=10,sticky="nsew")
 
 frame5=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
-frame5.grid(row=0, column=2, padx=10, pady=10,sticky="nsew")
+frame5.grid(row=0, column=2, padx=10, pady=10,sticky="nsew")'''
 
 
 
