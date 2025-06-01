@@ -1,7 +1,7 @@
 import mariadb
 import POO_banco_e_py
 import inserir_usuario
-from inserir_usuario import pessoas
+from inserir_usuario import Pessoa
 from funcao_usuario import listar_usuarios
 from funcao_usuario import buscar_nome
 from funcao_usuario import deletar
@@ -23,7 +23,8 @@ while True:
         idade=int(input("digite a idade: "))
         sobrenome=input("digite o sobrenome: ")
         cidade=input("digite a cidade: ")
-        inserir=pessoas(nome,idade,sobrenome,cidade)
+        senha=input("digite a senha: ")
+        inserir = Pessoa(nome, idade, sobrenome, cidade, senha)
         inserir.inserir_no_banco(conectar)
 
     elif n==2:

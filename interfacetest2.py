@@ -151,13 +151,13 @@ botao_mostrar.grid(row = 1, column = 2, pady=(10,1), padx=(10),stick="nsew")
 #frame4
 
 frame4=ctk.CTkFrame(master=janela, corner_radius=10,fg_color="transparent")
-frame4.grid(row=3, column=0, columnspan=7, padx=10, pady=10,sticky="")
+frame4.grid(row=3, column=0, columnspan=7, padx=20, pady=20,sticky="")
 
 botao = ctk.CTkButton(master=frame4,text="Entre", command=vai_la)
 botao.grid(row = 0, column = 0, pady=(10,1), padx=(10),stick="nsew")
 
 label3 = ctk.CTkLabel(master=frame4, text="")
-label3.grid(row = 1, column = 0, pady=(10,1), padx=(10),stick="nsew")
+label3.grid(row = 1, column = 0, pady=(), padx=(),stick="")
 
 
 """botao = ctk.CTkButton(master=frame4, text="Mostrar Alerta", command=alerta)

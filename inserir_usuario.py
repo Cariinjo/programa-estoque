@@ -1,19 +1,18 @@
-import mariadb
+class Pessoa:
+    def __init__(self, nome, idade, sobrenome, cidade, senha):
+        self.nome = nome
+        self.idade = idade
+        self.sobrenome = sobrenome
+        self.cidade = cidade
+        self.senha = senha
 
-class pessoas:
-    def __init__(self,nome,idade,sobrenome,cidade):
-        self.nome=nome
-        self.idade=idade
-        self.sobrenome=sobrenome
-        self.cidade=cidade
-
-    def inserir_no_banco(self,batata):
+    def inserir_no_banco(self, conexao):
         try:
-            batata.cursor.execute(
-                "insert into usuarios(nome,idade,sobrenome,cidade) values (?,?,?,?)",
-                (self.nome, self.idade, self.sobrenome, self.cidade)
+            conexao.cursor.execute(
+                "INSERT INTO usuarios (nome, idade, sobrenome, cidade, senha) VALUES (?, ?, ?, ?, ?)",
+                (self.nome, self.idade, self.sobrenome, self.cidade, self.senha)
             )
-            batata.conn.commit()
-            print ("usuario inserido com sucesso!\n")
+            conexao.conn.commit()
+            print("Usuário inserido com sucesso!\n")
         except mariadb.Error as e:
-            print("Erro ao inserir usuario:", e)
+            print(f"Erro ao inserir usuário '{self.nome}': {e}")
