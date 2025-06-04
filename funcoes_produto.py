@@ -16,8 +16,7 @@ class Produto:
             print("Produto inserido com sucesso!\n")
         except Exception as e:
             print(f"Erro ao inserir produto '{self.nome}': {e}")
-            
-            
+
 def listar_produtos(cursor, label):
     cursor.execute("SELECT * FROM produtos")
     produtos = cursor.fetchall()

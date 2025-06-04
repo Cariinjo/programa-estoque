@@ -1,9 +1,11 @@
+# codigo main:
+
 import customtkinter as ctk
 from tkinter import messagebox
 from PIL import Image
 from POO_banco_e_py import Banco
 from inserir_usuario import Pessoa
-from estoque_painel import clique
+from estoque_painel import clique # Mantenha o import de clique
 
 # Tema
 ctk.set_appearance_mode("dark")
@@ -11,6 +13,7 @@ ctk.set_default_color_theme("dark-blue")
 
 # Autenticação
 def vai_la(nome_usuario, senha_usuario, banco_nome="banco_py"):
+    # ... (código da função vai_la sem alterações) ...
     try:
         conectar = Banco(banco_nome)
     except Exception as e:
@@ -42,26 +45,33 @@ def vai_la(nome_usuario, senha_usuario, banco_nome="banco_py"):
         conectar.fechar_conexao()
         return False
 
-# Nova janela após login
-
 
 # Alternar visibilidade da senha
-imagem = Image.open("olho_aberto.png")
-imagem_olho_a = ctk.CTkImage(light_image=imagem, dark_image=imagem, size=(25, 25))
-imagem = Image.open("olho_fechado.png")
-imagem_olho_f = ctk.CTkImage(light_image=imagem, dark_image=imagem, size=(25, 25))
+# (Presumo que as imagens "olho_aberto.png" e "olho_fechado.png" existem no mesmo diretório)
+try:
+    imagem_aberto_pil = Image.open("olho_aberto.png")
+    imagem_olho_a = ctk.CTkImage(light_image=imagem_aberto_pil, dark_image=imagem_aberto_pil, size=(25, 25))
+    imagem_fechado_pil = Image.open("olho_fechado.png")
+    imagem_olho_f = ctk.CTkImage(light_image=imagem_fechado_pil, dark_image=imagem_fechado_pil, size=(25, 25))
+except FileNotFoundError:
+    print("Aviso: Arquivos de imagem dos olhos não encontrados. O botão de mostrar senha pode não ter ícones.")
+    imagem_olho_a = None # Fallback
+    imagem_olho_f = None # Fallback
 
+
+mostrar = False
 def alternar_senha():
     global mostrar
     if mostrar:
         entry2.configure(show="*")
-        botao_mostrar.configure(image=imagem_olho_f)
+        if imagem_olho_f:
+            botao_mostrar.configure(image=imagem_olho_f)
     else:
         entry2.configure(show="")
-        botao_mostrar.configure(image=imagem_olho_a)
+        if imagem_olho_a:
+            botao_mostrar.configure(image=imagem_olho_a)
     mostrar = not mostrar
 
-mostrar = False
 
 # Verificação de login
 def verificar_login():
@@ -74,14 +84,14 @@ def verificar_login():
 
     if vai_la(nome, senha):
         messagebox.showinfo("Login", "Login realizado com sucesso!")
-        janela.destroy()
-        clique()
-        
+        janela.withdraw() # ESCONDA a janela de login em vez de destruí-la
+        clique(janela)    # PASSE a janela de login para a função clique
     else:
         messagebox.showerror("Erro", "Usuário ou senha incorretos.")
 
 # Nova janela de cadastro
 def abrir_cadastro():
+    # ... (código da função abrir_cadastro sem alterações) ...
     cadastro_janela = ctk.CTkToplevel()
     cadastro_janela.title("Cadastro de Usuário")
     cadastro_janela.geometry("400x500")
@@ -135,6 +145,7 @@ def abrir_cadastro():
     botao_salvar = ctk.CTkButton(cadastro_janela, text="Salvar", command=salvar_usuario)
     botao_salvar.pack(pady=20)
 
+
 # Interface principal
 janela = ctk.CTk()
 janela.title("Login - Programa de Teste")
@@ -144,20 +155,27 @@ janela.geometry("700x500")
 # Frame 1 (logo)
 frame1 = ctk.CTkFrame(master=janela, corner_radius=10, fg_color="transparent")
 frame1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-imagem = Image.open("logo.png")
-imagem_ctk = ctk.CTkImage(light_image=imagem, dark_image=imagem, size=(100, 100))
-label_imagem = ctk.CTkLabel(master=frame1, image=imagem_ctk, text="")
-label_imagem.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+
+try:
+    imagem_logo_pil = Image.open("logo.png")
+    imagem_ctk = ctk.CTkImage(light_image=imagem_logo_pil, dark_image=imagem_logo_pil, size=(100, 100))
+    label_imagem = ctk.CTkLabel(master=frame1, image=imagem_ctk, text="")
+    label_imagem.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+except FileNotFoundError:
+    print("Aviso: Arquivo 'logo.png' não encontrado. O logo não será exibido.")
+    label_imagem_fallback = ctk.CTkLabel(master=frame1, text="[LOGO]", font=("Arial", 20)) # Fallback
+    label_imagem_fallback.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+
 
 # Frame 2 (título)
 frame2 = ctk.CTkFrame(master=janela, corner_radius=10, fg_color="transparent")
-frame2.grid(row=0, column=1, columnspan=7, padx=10, pady=10, sticky="ew")
+frame2.grid(row=0, column=1, columnspan=7, padx=10, pady=10, sticky="ew") #row 0 -> 1
 label = ctk.CTkLabel(master=frame2, text="Bem vindo ao programa de teste:", text_color="white", font=("Arial", 30, "bold"), justify="center")
 label.grid(row=0, column=0, columnspan=7, padx=10, pady=10, sticky="ew")
 
 # Frame 3 (entradas)
 frame3 = ctk.CTkFrame(master=janela, corner_radius=10, fg_color="transparent")
-frame3.grid(row=2, column=0, columnspan=7, padx=10, pady=10, sticky="")
+frame3.grid(row=2, column=0, columnspan=7, padx=10, pady=10, sticky="") # row 2 -> 1
 label1 = ctk.CTkLabel(master=frame3, text="Usuário:")
 label1.grid(row=0, column=0, pady=(10, 1), padx=(10), sticky="w")
 
@@ -170,8 +188,10 @@ label2.grid(row=1, column=0, pady=(10, 1), padx=(10), sticky="w")
 entry2 = ctk.CTkEntry(master=frame3, placeholder_text="Digite sua senha:", show="*")
 entry2.grid(row=1, column=1, pady=(10, 1), padx=(10), sticky="nsew")
 
-botao_mostrar = ctk.CTkButton(master=frame3, command=alternar_senha, text="", image=imagem_olho_f, width=25, height=25, fg_color="grey", hover_color="grey", corner_radius=10)
+# Usar a imagem carregada globalmente
+botao_mostrar = ctk.CTkButton(master=frame3, command=alternar_senha, text="", image=imagem_olho_f if imagem_olho_f else None, width=25, height=25, fg_color="grey", hover_color="grey", corner_radius=10)
 botao_mostrar.grid(row=1, column=2, pady=(10, 1), padx=(10), sticky="nsew")
+if not imagem_olho_f : botao_mostrar.configure(text="👁") # Fallback text if image fails
 
 # Frame 4 (botões)
 frame4 = ctk.CTkFrame(master=janela, corner_radius=10, fg_color="transparent")
