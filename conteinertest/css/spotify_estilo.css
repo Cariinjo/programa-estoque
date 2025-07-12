@@ -1,0 +1,215 @@
+/* === fundo do site === */
+body {
+    background: linear-gradient(180deg, rgba(40, 89, 19, 1) 0%, rgba(46, 102, 62, 1) 45%, rgba(3, 173, 94, 1) 100%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* === container principal === */
+.container {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(10, 100px);
+    gap: 10px;
+    margin: 10px;
+}
+
+/* === topo com logo, pesquisa e botões === */
+
+.topo2 {
+    display: flex;
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+    align-items: center;
+    justify-content: left;
+    padding: 10px;
+    border-radius: 10px;
+    justify-items: left;
+    z-index: 1;
+    width: 20%;
+    gap: 10px;
+}
+.top {
+    display: flex;
+    gap: 10px;
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+    justify-content: right;
+    background-color: rgba(0, 0, 0, 0.781);
+    border-radius: 10px;
+    align-items: center;
+    padding-right: 10px;
+}
+
+/* === logo === */
+.logo img {
+    height: 80px;
+    border-radius: 10px;
+    justify-content: left;
+    justify-items: left;
+    align-items: center;
+}
+.home{
+    display: flex;
+}
+
+/* === barra de pesquisa === */
+.pesquisa {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-items: center;
+}
+.pesquisa i {
+    color: white;
+    font-size: 30px
+}
+.pesquisa input {
+    width: 92%;
+    height: 40px;
+    border-radius: 30px;
+    font-size: 16px;
+    color: white;
+    background-color: #222;
+    border: none;
+    padding-left: 15px;
+    outline: none;
+}
+
+/* === botões do topo === */
+.topo2 button {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
+    border-radius: 30px;
+    border: none;
+    background-color: #1db954;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 20px;
+}
+
+.topo2 button:hover {
+    background-color: #1ed760;
+}
+
+.top button {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
+    border-radius: 30px;
+    border: none;
+    background-color: #1db954;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.top button:hover {
+    background-color: #1ed760;
+}
+
+/* === biblioteca lateral === */
+.biblioteca {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: rgb(68, 68, 68);
+    border-radius: 10px;
+    width: 300px;
+    padding: 10px;
+}
+
+.biblioteca h3 {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+    margin: 10px 0;
+    color: white;
+}
+
+/* === criar playlist === */
+.criar {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / 4;
+    grid-row: 2 / 4;
+    border-radius: 10px;
+    margin-top: 10px;
+    color: white;
+    gap: 10px;
+}
+
+.criar p {
+    margin: 5px 0;
+}
+
+.criar button {
+    border-radius: 50px;
+    height: 50px;
+    width: 150px;
+    border: none;
+    background-color: #1db954;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.criar button:hover {
+    background-color: #1ed760;
+}
+
+/* === seguir podcast === */
+.seguir {
+    grid-column: 1 / 2;
+    grid-row: 4 / 6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: rgb(68, 68, 68);
+    border-radius: 10px;
+    width: 300px;
+    padding: 10px;
+    color: white;
+}
+
+.seguir button {
+    border-radius: 50px;
+    height: 50px;
+    width: 150px;
+    border: none;
+    background-color: #1db954;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.seguir button:hover {
+    background-color: #1ed760;
+}
+.principal {
+    grid-column: 2/ 6;
+    grid-row: 2/ 8;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.musica-em-alta{
+    grid-column: 1 / 6;
+    grid-row: 1 / 6;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background-color: rgb(68, 68, 68);
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+}

@@ -1,0 +1,326 @@
+body{
+background: #285913;
+background: linear-gradient(180deg,rgba(40, 89, 19, 1) 0%, rgba(46, 102, 62, 1) 45%, rgba(3, 173, 94, 1) 100%);
+margin: 0;
+width: 100%;
+height: 100%;
+}
+
+.titulo_nav{
+display: flex;
+flex-direction: row;
+width: 100%;
+}
+.logo{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: #000000;
+    background-color: #ffffff81;
+    border-radius: 20px;
+    flex-grow: 0;
+    height: 100px;
+    margin: 10px;
+}
+
+.menu1{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    color: #000000;
+    background-color: #ffffff81;
+    border-radius: 20px;
+    flex-grow: 1;
+    gap: 150px;
+    font-size: 150%;
+    margin: 10px;
+    align-items: center;
+}
+
+.menu1 ul{
+display: flex;
+list-style-type:none;
+justify-content: start;
+margin: 0;
+padding: 0;
+overflow: hidden;
+background-color: #333;
+width: 100%;
+height: 100px;
+border-radius: 20px;
+align-items: center;
+}
+
+.menu1 li {
+margin: 10px;
+border-radius: 20px;
+flex-grow: 0;
+float: left;
+align-items: center;
+}
+
+.menu1 li a {
+border-radius: 20px;
+display: flex;
+color: white;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+align-items: center;
+}
+
+.menu1 li a:hover {
+flex-grow: 1;
+background-color: #111;
+align-items: center;
+}
+
+.menu1 .active {
+flex-grow: 1;
+background-color: #04AA6D;
+
+}
+
+.menu1 li:last-child {
+    margin-left: auto;
+    margin-right: 20px; /* ou outro valor que desejar */
+}
+
+.menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    color: #000000;
+    background-color: #ffffff81;
+    border-radius: 20px;
+    flex-grow: 1;
+    gap: 150px;
+    font-size: 150%;
+    margin: 10px;
+    align-items: center;
+}
+.textobody {
+background-image: url("../imagem/mustang.jpg");
+display: flex;
+justify-content: center;
+flex-direction: column;
+color: #000000;
+border-radius: 20px;
+margin: 10px;
+height: 700px;
+font-size: 200%;
+align-items: center;
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+}
+.fundo_transparente {
+background-color: rgba(255, 255, 255, 0.178);
+backdrop-filter: blur(4px);
+-webkit-backdrop-filter: blur(8px);
+padding: 20px 40px;
+border-radius: 10px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+z-index: 2;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+}
+
+.texto{
+display: flex;
+margin: 30px;
+}
+.cartao{
+margin: 10px;
+padding: 10px;
+display: flex;
+border-radius: 10px;
+padding: 20px 40px;
+justify-content: center;
+align-items: center;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+gap: 60px;
+}
+.azul{
+padding: 20px 20px;
+justify-content: center;
+align-items: center;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+border-radius: 20px;
+background-color: #756666be;
+
+}
+.amarelo{
+padding: 20px 20px;
+justify-content: center;
+align-items: center;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+border-radius: 20px;
+background-color: #756666be;
+
+}
+.vermelho{
+padding: 20px 20px;
+justify-content: center;
+align-items: center;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+border-radius: 20px;
+background-color: #756666be;
+
+}
+.laranja{
+padding: 20px 20px;
+justify-content: center;
+align-items: center;
+box-shadow: 10px 10px 30px  rgba(0, 0, 0, 0.61);
+border-radius: 20px;
+background-color: #756666be;
+}
+
+a{
+color:#000000
+}
+
+a.hover{
+color: #3a6b2b;
+}
+
+@media (min-width: 600px) and (max-width: 1024px) {
+    /* TÍTULO/NAV (HEADER) - Muda para linha */
+    .titulo_nav {
+        flex-direction: row; /* Volta para linha */
+        align-items: center;
+    }
+
+    /* LOGO - Ajustes para tablet/desktop */
+    .logo {
+        height: 100px; /* Volta para a altura maior */
+        margin: 10px;
+        width: auto; /* Deixa a largura automática */
+        max-width: none; /* Remove o limite */
+    }
+
+    /* MENU - Ajustes para tablet/desktop */
+    .menu {
+        flex-direction: row; /* Volta para linha */
+        gap: 50px; /* Aumenta o espaçamento entre itens do menu */
+        font-size: 150%; /* Volta para o tamanho maior da fonte */
+        width: auto; /* Deixa a largura automática */
+        height: 100px; /* Define altura fixa novamente */
+    }
+
+    /* SEÇÃO PRINCIPAL (TEXTOBODY) - Ajustes para tablet/desktop */
+    .textobody {
+        height: 550px; /* Altura ajustada para tablet */
+        font-size: 180%;
+    }
+
+    /* FUNDO TRANSPARENTE - Ajustes para tablet/desktop */
+    .fundo_transparente {
+        padding: 20px 40px; /* Volta ao padding original */
+        box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.61); /* Volta à sombra original */
+        max-width: 70%; /* Aumenta a largura máxima */
+    }
+
+    /* CONTÊINER DOS CARTÕES - Volta para linha, permite quebra */
+    .cartao {
+        flex-direction: row; /* Volta para linha */
+        flex-wrap: wrap; /* Permite que os cartões quebrem para a próxima linha se não couberem */
+        gap: 30px; /* Espaçamento entre os cartões */
+        padding: 20px; /* Padding ajustado */
+    }
+
+    /* CARTÕES INDIVIDUAIS - Ajustes para tablet/desktop */
+    .azul, .amarelo, .vermelho, .laranja {
+        width: auto; /* Deixa a largura ser determinada pelo conteúdo/flex-basis */
+        flex-basis: calc(50% - 30px); /* Cada um ocupa cerca de metade do espaço menos o gap */
+        max-width: calc(50% - 30px); /* Garante que não passem de metade da linha */
+        font-size: 100%;
+    }
+}
+
+/* --- MEDIA QUERY PARA DESKTOPS (A PARTIR DE 1024px de largura) --- */
+@media (min-width: 1024px) {
+    /* LOGO */
+    .logo {
+        height: 100px;
+        margin: 10px;
+    }
+
+    /* MENU */
+    .menu {
+        gap: 150px; /* Espaçamento maior para desktops grandes */
+        font-size: 150%;
+        height: 100px;
+        margin: 10px;
+    }
+
+    /* SEÇÃO PRINCIPAL (TEXTOBODY) */
+    .textobody {
+        height: 700px; /* Altura original para desktop */
+        font-size: 200%;
+    }
+
+    /* FUNDO TRANSPARENTE */
+    .fundo_transparente {
+        padding: 20px 40px;
+        max-width: 60%; /* Aumenta a largura máxima */
+    }
+
+    /* CARTÕES INDIVIDUAIS - PARA DESKTOP */
+    .cartao {
+        gap: 60px; /* Espaçamento maior entre os cartões */
+        justify-content: center; /* Centraliza os cartões */
+    }
+
+    .azul, .amarelo, .vermelho, .laranja {
+        flex-basis: calc(25% - 60px); /* Quatro cartões por linha, ajustando para o gap */
+        max-width: calc(25% - 60px); /* Garante que não passem de um quarto da linha */
+        font-size: 100%;
+    }
+}
+
+
+/* === IMAGENS DE CARROS (RESPONSIVAS E IGUAIS) === */
+.carro-img {
+width: 100%;
+aspect-ratio: 4 / 3; /* Ou 16/9 ou 1/1 conforme desejar */
+object-fit: cover;
+border-radius: 10px;
+}
+
+/* === BLOCOS DOS CARROS COM ESTILO UNIFORME === */
+.carro-box {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-color: #756666be;
+padding: 20px;
+border-radius: 20px;
+box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.61);
+flex: 1 1 250px;
+max-width: 300px;
+}
+
+.cartao {
+display: flex;
+flex-wrap: wrap; /* permite quebrar linha */
+gap: 30px;
+justify-content: center;
+padding: 20px;
+}
+
+.data {
+    color: rgb(0, 0, 0);
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+    margin: 10px;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.61);
+}
+
