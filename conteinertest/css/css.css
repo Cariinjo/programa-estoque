@@ -1,0 +1,118 @@
+body{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+}
+.cartao {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #681717;
+  border-radius: 8px;
+}
+
+.carro-box {
+  width: calc(25% - 20px);
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+
+.carro-img {
+  width: 100%;
+  height: auto;
+}
+
+.carro-info {
+  padding: 12px 16px;
+}
+
+.carro-info h5 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.carro-info p {
+  margin: 0;
+  color: #000000;
+}
+
+#pedidos-de-carros {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.lista-de-pedidos {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#adicionar-pedido {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#adicionar-pedido:hover {
+  background-color: #45a049;
+}
+
+#lista-pedidos {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #fff;
+}
+
+#campo-pedido {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.entrada input {
+padding: 8px;
+font-size: 16px;
+margin-bottom: 20px;
+}
+
+.cracha {
+display: inline-flex;
+align-items: center;
+background: white;
+border: 2px solid #333;
+padding: 15px;
+border-radius: 10px;
+width: 300px;
+box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+.cracha img {
+width: 100px;
+height: 100px;
+border-radius: 8px;
+margin-right: 15px;
+}
+
+.cracha .info {
+text-align: left;
+}
