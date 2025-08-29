@@ -134,14 +134,3 @@ cardi.style.backgroundColor="purple";
 cardi.style.borderRadius="10px";
 card1.appendChild(cardi);
 
-/*class cards.style{
-    width:"300px";
-    height:"500px";
-    backgroundColor:"lightblue";
-    borderRadius:"10px";
-    margin:"10px";
-    display:"flex";
-    flexDirection:"column";
-    alignItems:"center";
-    boxShadow:"2px 2px 5px black";
-};*/
