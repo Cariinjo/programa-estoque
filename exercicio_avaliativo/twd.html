@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz Wandinha - 10 perguntas</title>
+  <style>
+    :root{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    body{background:linear-gradient(180deg,#1e1b4b 0%,#0f172a 100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);width:100%;max-width:820px;padding:24px}
+    h1{margin:0 0 8px;font-size:22px}
+    p.lead{margin:0 0 18px;color:#cfe6ff}
+    .progress{height:10px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;margin-bottom:18px}
+    .bar{height:100%;background:linear-gradient(90deg,#a78bfa,#60a5fa);width:0%}
+    .question{margin-bottom:12px;font-size:18px}
+    .options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+    label.option{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+    input[type="radio"]{width:18px;height:18px}
+    .controls{display:flex;gap:8px;justify-content:flex-end}
+    button{background:#7c3aed;border:none;padding:10px 14px;border-radius:8px;color:#fff;cursor:pointer;font-weight:600}
+    button.ghost{background:transparent;color:#bcd7ff;border:1px solid rgba(255,255,255,0.06)}
+    .results{margin-top:18px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);}
+    .correct{background:rgba(34,197,94,0.12);border-left:4px solid rgba(34,197,94,0.8);padding:8px;border-radius:6px}
+    .wrong{background:rgba(239,68,68,0.10);border-left:4px solid rgba(239,68,68,0.85);padding:8px;border-radius:6px}
+    footer{margin-top:14px;color:#9fb8db;font-size:13px;text-align:center}
+    @media (max-width:520px){.card{padding:16px}h1{font-size:18px}.question{font-size:16px}}
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Quiz — Wandinha (10 perguntas)</h1>
+    <p class="lead">Responda as 10 perguntas. No final você verá sua pontuação e as respostas corretas.</p>
+
+    <div class="progress" aria-hidden>
+      <div class="bar" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <form id="quizForm" aria-labelledby="quizTitle">
+      <div id="questionWrap"></div>
+
+      <div class="controls">
+        <button type="button" id="prevBtn" class="ghost">Anterior</button>
+        <button type="button" id="nextBtn">Próxima</button>
+        <button type="submit" id="submitBtn" style="display:none">Enviar</button>
+      </div>
+    </form>
+
+    <div id="results" class="results" hidden></div>
+    <footer>Feito com ❤️ — perguntas baseadas na série <em>Wandinha</em>.</footer>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        q: 'Qual atriz interpreta Wandinha Addams na série da Netflix?',
+        options: ['Jenna Ortega', 'Christina Ricci', 'Emma Myers', 'Catherine Zeta-Jones'],
+        answer: 0
+      },
+      {
+        q: 'Em qual escola Wandinha passa a maior parte da série?',
+        options: ['Escola Normal de Jericho', 'Escola Sombria', 'Academia Nevermore', 'Instituto Addams'],
+        answer: 2
+      },
+      {
+        q: 'Quem é a colega de quarto de Wandinha em Nevermore?',
+        options: ['Bianca Barclay', 'Enid Sinclair', 'Yoko Tanaka', 'Wednesday não tem colega'],
+        answer: 1
+      },
+      {
+        q: 'Qual habilidade sobrenatural Wandinha descobre possuir?',
+        options: ['Telepatia', 'Visões psíquicas', 'Controle de sombras', 'Telecinese'],
+        answer: 1
+      },
+      {
+        q: 'Quem é o diretor(a) da Academia Nevermore?',
+        options: ['Larissa Weems', 'Mortícia Addams', 'Marilyn Thornhill', 'Principal Gates'],
+        answer: 0
+      },
+      {
+        q: 'Qual personagem se transforma em monstro conhecido como Hyde?',
+        options: ['Xavier Thorpe', 'Tyler Galpin', 'Ajax Petropolus', 'Lucas Walker'],
+        answer: 1
+      },
+      {
+        q: 'Quem é a professora de botânica que também é cúmplice do Hyde?',
+        options: ['Larissa Weems', 'Marilyn Thornhill', 'Enid Sinclair', 'Bianca Barclay'],
+        answer: 1
+      },
+      {
+        q: 'Qual é o nome da cidade vizinha de Nevermore?',
+        options: ['Jericho', 'Salem', 'Ravenwood', 'Darkmoor'],
+        answer: 0
+      },
+      {
+        q: 'Que membro da Família Addams aparece como Mãozinha ajudando Wandinha?',
+        options: ['Tio Chico', 'Cousin Itt', 'Thing (Mãozinha)', 'Pugsley'],
+        answer: 2
+      },
+      {
+        q: 'Quem faz uma participação especial como professora na série, tendo interpretado Wandinha nos filmes antigos?',
+        options: ['Anjelica Huston', 'Christina Ricci', 'Jenna Ortega', 'Winona Ryder'],
+        answer: 1
+      }
+    ];
+
+    const questionWrap = document.getElementById('questionWrap');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultsDiv = document.getElementById('results');
+    const form = document.getElementById('quizForm');
+
+    let current = 0;
+    const userAnswers = Array(questions.length).fill(null);
+
+    function renderQuestion(index){
+      const item = questions[index];
+      questionWrap.innerHTML = '';
+
+      const qEl = document.createElement('div');
+      qEl.className = 'question';
+      qEl.innerHTML = `<strong>Pergunta ${index+1} de ${questions.length}:</strong> ${item.q}`;
+
+      const optionsEl = document.createElement('div');
+      optionsEl.className = 'options';
+
+      item.options.forEach((opt, i) => {
+        const id = `q${index}_opt${i}`;
+        const label = document.createElement('label');
+        label.className = 'option';
+        label.setAttribute('for', id);
+        label.innerHTML = `\n          <input type="radio" name="q${index}" id="${id}" value="${i}" required>\n          <span>${opt}</span>\n        `;
+        optionsEl.appendChild(label);
+      });
+
+      questionWrap.appendChild(qEl);
+      questionWrap.appendChild(optionsEl);
+
+      prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+      nextBtn.style.display = index === questions.length - 1 ? 'none' : 'inline-block';
+      submitBtn.style.display = index === questions.length - 1 ? 'inline-block' : 'none';
+
+      const pct = Math.round(((index) / (questions.length)) * 100);
+      progressBar.style.width = pct + '%';
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if(current > 0){
+        current--;
+        renderQuestion(current);
+        restoreAnswer(current);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      const checked = form.querySelector(`input[name="q${current}"]:checked`);
+      if(!checked){
+        alert('Por favor, selecione uma opção para continuar.');
+        return;
+      }
+      saveAnswer(current);
+      if(current < questions.length - 1){
+        current++;
+        renderQuestion(current);
+        restoreAnswer(current);
+      }
+    });
+
+    function saveAnswer(idx){
+      const checked = form.querySelector(`input[name="q${idx}"]:checked`);
+      if(checked) userAnswers[idx] = Number(checked.value);
+    }
+    function restoreAnswer(idx){
+      const val = userAnswers[idx];
+      if(val !== null){
+        const el = form.querySelector(`input[name="q${idx}"][value=\"${val}\"]`);
+        if(el) el.checked = true;
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const checkedLast = form.querySelector(`input[name="q${current}"]:checked`);
+      if(!checkedLast){ alert('Marque uma opção na última pergunta antes de enviar.'); return; }
+      saveAnswer(current);
+      gradeQuiz();
+    });
+
+    function gradeQuiz(){
+      let score = 0;
+      resultsDiv.innerHTML = '';
+
+      questions.forEach((q, i) => {
+        const user = userAnswers[i];
+        const container = document.createElement('div');
+        if(user === q.answer){
+          score++;
+          container.className = 'correct';
+          container.innerHTML = `<strong>Pergunta ${i+1} — correta</strong><div>Você: ${q.options[user]}</div><div>Resposta: ${q.options[q.answer]}</div>`;
+        } else {
+          container.className = 'wrong';
+          container.innerHTML = `<strong>Pergunta ${i+1} — incorreta</strong><div>Você: ${user===null? 'Não respondeu' : q.options[user]}</div><div>Resposta: ${q.options[q.answer]}</div>`;
+        }
+        resultsDiv.appendChild(container);
+        resultsDiv.appendChild(document.createElement('br'));
+      });
+
+      const summary = document.createElement('div');
+      summary.style.marginTop = '12px';
+      summary.innerHTML = `<h2>Você acertou ${score} de ${questions.length} (${Math.round((score/questions.length)*100)}%)</h2>`;
+      resultsDiv.prepend(summary);
+      resultsDiv.hidden = false;
+
+      const resetBtn = document.createElement('button');
+      resetBtn.textContent = 'Refazer quiz';
+      resetBtn.addEventListener('click', () => location.reload());
+      resultsDiv.appendChild(resetBtn);
+
+      document.querySelector('.controls').style.display = 'none';
+      questionWrap.style.display = 'none';
+      progressBar.style.width = '100%';
+    }
+
+    renderQuestion(0);
+  </script>
+</body>
+</html>
