@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokedex</title>
+  <link rel="stylesheet" href="../css/apipokemon.css" />
+
+</head>
+
+<body>
+  <h1>Pokedex</h1>
+
+  <div class="search-container">
+    <input type="text" id="pokemon-input" placeholder="Digite o nome ou número" />
+    <button id="search-button">Buscar Pokémon</button>
+  </div>
+
+  <!-- O card do Pokémon começará escondido -->
+  <div id="pokemon-card" class="hidden">
+    <h2 id="pokemon-name"></h2>
+    <p id="pokemon-id"></p>
+    <img id="pokemon-sprite" src="" alt="Imagem do Pokémon" />
+    <p id="pokemon-types"></p>
+  </div>
+
+  <script src="../js/apipokemon.js"></script>
+
+</body>
+</html>
