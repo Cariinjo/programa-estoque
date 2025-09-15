@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Busca Harry Potter - API</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input { padding: 5px; width: 200px; }
+    button { padding: 5px 10px; margin-left: 5px; }
+    .card { border: 1px solid #ccc; padding: 10px; margin-top: 10px; display: inline-block; text-align: center; }
+    .hidden { display: none; }
+    img { width: 150px; height: auto; margin-top: 10px; }
+  </style>
+  <link rel="stylesheet" href="../css/apidehp.css">
+</head>
+<body>
+  <h1>Buscar Personagem HP</h1>
+  <input type="text" id="hp-input" placeholder="Digite o nome do personagem">
+  <button id="search-button">Buscar</button>
+
+  <div id="hp-card" class="card hidden">
+    <h2 id="hp-nome"></h2>
+    <p id="hp-casa"></p>
+    <p id="hp-varinha"></p>
+    <img id="hp-imagem" src="" alt="Imagem do personagem">
+  </div>
+
+  <script type="module" src="../js/apidehp.js"></script>
+</body>
+</html>
