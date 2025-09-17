@@ -1,0 +1,318 @@
+# Define a aparência de uma linha na tabela de estoque
+<StockRow@BoxLayout>:
+    product_text: ''
+    kg_text: ''
+    Label:
+        text: root.product_text
+    Label:
+        text: root.kg_text
+        size_hint_x: 0.5
+
+# Define a aparência de uma linha na tabela de logs
+<LogEntryRow@BoxLayout>:
+    id_text: ''
+    type_text: ''
+    client_text: ''
+    farm_text: ''
+    product_text: ''
+    weight_text: ''
+    time_text: ''
+    Label:
+        text: root.id_text
+        size_hint_x: 0.1
+    Label:
+        text: root.type_text
+        size_hint_x: 0.2
+    Label:
+        text: root.client_text
+        size_hint_x: 0.4
+    Label:
+        text: root.farm_text
+        size_hint_x: 0.3
+    Label:
+        # Linha corrigida abaixo
+        text: root.product_text
+        size_hint_x: 0.3
+    Label:
+        text: root.weight_text
+        size_hint_x: 0.2
+    Label:
+        text: root.time_text
+        size_hint_x: 0.5
+
+# ---- Definição da interface principal ----
+MainLayout:
+    orientation: 'vertical'
+
+    TabbedPanel:
+        do_default_tab: False
+
+        # --- ABA 1: CLIENTES E FAZENDAS ---
+        TabbedPanelItem:
+            text: 'Clientes / Fazendas'
+            BoxLayout:
+                padding: 10
+                spacing: 10
+                orientation: 'horizontal'
+
+                # Coluna da Esquerda: Adicionar Cliente
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 5
+                    size_hint_x: 0.4
+                    Label:
+                        text: 'Novo Cliente'
+                        size_hint_y: None
+                        height: 30
+                        halign: 'left'
+                        text_size: self.size
+                    TextInput:
+                        id: client_name_input
+                        hint_text: 'Nome do Cliente'
+                        size_hint_y: None
+                        height: 40
+                    TextInput:
+                        id: client_doc_input
+                        hint_text: 'Documento (Opcional)'
+                        size_hint_y: None
+                        height: 40
+                    Button:
+                        text: 'Adicionar Cliente'
+                        on_press: app.on_add_client()
+                        size_hint_y: None
+                        height: 40
+                    Widget: # Espaçador
+
+                # Coluna da Direita: Adicionar Fazenda
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 5
+                    Label:
+                        text: 'Fazenda para Cliente Selecionado'
+                        size_hint_y: None
+                        height: 30
+                        halign: 'left'
+                        text_size: self.size
+                    Spinner:
+                        id: clients_combo
+                        text: 'Selecione um cliente'
+                        values: app.client_list
+                        size_hint_y: None
+                        height: 40
+                        on_text: app.on_client_selection_change(self.text)
+                    TextInput:
+                        id: farm_name_input
+                        hint_text: 'Nome da Fazenda'
+                        size_hint_y: None
+                        height: 40
+                    Button:
+                        text: 'Adicionar Fazenda'
+                        on_press: app.on_add_farm()
+                        size_hint_y: None
+                        height: 40
+                    Label:
+                        text: 'Fazendas existentes:'
+                        size_hint_y: None
+                        height: 30
+                        halign: 'left'
+                        text_size: self.size
+                    RecycleView:
+                        id: farms_rv
+                        viewclass: 'Label'
+                        RecycleBoxLayout:
+                            default_size: None, 30
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+
+        # --- ABA 2: ENTRADA E SAÍDA ---
+        TabbedPanelItem:
+            text: 'Entrada / Saída'
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    padding: 10
+                    spacing: 8
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                    Label:
+                        text: 'Registrar Movimento'
+                        size_hint_y: None
+                        height: 30
+                    BoxLayout:
+                        size_hint_y: None
+                        height: 30
+                        Label:
+                            text: 'Tipo:'
+                        CheckBox:
+                            id: check_entry
+                            group: 'mov_type'
+                            active: True
+                        Label:
+                            text: 'Entrada'
+                        CheckBox:
+                            id: check_exit
+                            group: 'mov_type'
+                        Label:
+                            text: 'Saída'
+
+                    Label:
+                        text: 'Cliente'
+                        halign: 'left'
+                        text_size: self.size
+                    Spinner:
+                        id: mov_client_combo
+                        text: 'Selecione...'
+                        values: app.client_list
+                        size_hint_y: None
+                        height: 40
+                    Label:
+                        text: 'Fazenda (opcional)'
+                        halign: 'left'
+                        text_size: self.size
+                    Spinner:
+                        id: mov_farm_combo
+                        text: 'Selecione...'
+                        values: app.farm_list
+                        size_hint_y: None
+                        height: 40
+                    
+                    GridLayout:
+                        cols: 2
+                        spacing: 5
+                        size_hint_y: None
+                        height: self.minimum_height
+                        
+                        Label:
+                            text: 'Motorista'
+                        TextInput:
+                            id: mov_driver_input
+                            size_hint_y: None
+                            height: 40
+                        Label:
+                            text: 'Veículo'
+                        TextInput:
+                            id: mov_vehicle_input
+                            size_hint_y: None
+                            height: 40
+                        Label:
+                            text: 'Produto'
+                        TextInput:
+                            id: mov_product_input
+                            size_hint_y: None
+                            height: 40
+                        Label:
+                            text: 'Peso (kg)'
+                        TextInput:
+                            id: mov_weight_input
+                            size_hint_y: None
+                            height: 40
+                            input_filter: 'float'
+                        Label:
+                            text: 'Umidade (%)'
+                        TextInput:
+                            id: mov_humidity_input
+                            size_hint_y: None
+                            height: 40
+                            input_filter: 'float'
+                        Label:
+                            text: 'Impureza (%)'
+                        TextInput:
+                            id: mov_impurity_input
+                            size_hint_y: None
+                            height: 40
+                            input_filter: 'float'
+
+                    Button:
+                        text: 'Registrar e Gerar Ticket'
+                        on_press: app.on_register_movement()
+                        size_hint_y: None
+                        height: 50
+                        background_color: 0, 0.7, 0.3, 1
+
+        # --- ABA 3: ESTOQUE ---
+        TabbedPanelItem:
+            text: 'Estoque'
+            BoxLayout:
+                orientation: 'vertical'
+                padding: 10
+                spacing: 10
+                BoxLayout:
+                    size_hint_y: None
+                    height: 30
+                    Label:
+                        text: 'Produto'
+                        bold: True
+                    Label:
+                        text: 'Kg em Estoque'
+                        bold: True
+                        size_hint_x: 0.5
+                RecycleView:
+                    id: stock_rv
+                    viewclass: 'StockRow'
+                    RecycleBoxLayout:
+                        default_size: None, 40
+                        default_size_hint: 1, None
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
+                Button:
+                    text: 'Atualizar'
+                    size_hint_y: None
+                    height: 40
+                    on_press: app.refresh_stock()
+
+        # --- ABA 4: ÚLTIMOS MOVIMENTOS ---
+        TabbedPanelItem:
+            text: 'Últimos Movimentos'
+            BoxLayout:
+                orientation: 'vertical'
+                padding: 10
+                spacing: 10
+                BoxLayout:
+                    size_hint_y: None
+                    height: 30
+                    Label:
+                        text: 'ID'
+                        size_hint_x: 0.1
+                        bold: True
+                    Label:
+                        text: 'Tipo'
+                        size_hint_x: 0.2
+                        bold: True
+                    Label:
+                        text: 'Cliente'
+                        size_hint_x: 0.4
+                        bold: True
+                    Label:
+                        text: 'Fazenda'
+                        size_hint_x: 0.3
+                        bold: True
+                    Label:
+                        text: 'Produto'
+                        size_hint_x: 0.3
+                        bold: True
+                    Label:
+                        text: 'Peso(kg)'
+                        size_hint_x: 0.2
+                        bold: True
+                    Label:
+                        text: 'Data'
+                        size_hint_x: 0.5
+                        bold: True
+                RecycleView:
+                    id: log_rv
+                    viewclass: 'LogEntryRow'
+                    RecycleBoxLayout:
+                        default_size: None, 40
+                        default_size_hint: 1, None
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
+                Button:
+                    text: 'Atualizar'
+                    size_hint_y: None
+                    height: 40
+                    on_press: app.refresh_movements()
