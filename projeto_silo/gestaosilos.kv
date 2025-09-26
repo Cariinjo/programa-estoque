@@ -1,47 +1,5 @@
-# Define a aparência de uma linha na tabela de estoque
-<StockRow@BoxLayout>:
-    product_text: ''
-    kg_text: ''
-    Label:
-        text: root.product_text
-    Label:
-        text: root.kg_text
-        size_hint_x: 0.5
-
-# Define a aparência de uma linha na tabela de logs
-<LogEntryRow@BoxLayout>:
-    id_text: ''
-    type_text: ''
-    client_text: ''
-    farm_text: ''
-    product_text: ''
-    weight_text: ''
-    time_text: ''
-    Label:
-        text: root.id_text
-        size_hint_x: 0.1
-    Label:
-        text: root.type_text
-        size_hint_x: 0.2
-    Label:
-        text: root.client_text
-        size_hint_x: 0.4
-    Label:
-        text: root.farm_text
-        size_hint_x: 0.3
-    Label:
-        # Linha corrigida abaixo
-        text: root.product_text
-        size_hint_x: 0.3
-    Label:
-        text: root.weight_text
-        size_hint_x: 0.2
-    Label:
-        text: root.time_text
-        size_hint_x: 0.5
-
 # ---- Definição da interface principal ----
-MainLayout:
+<MainLayout>:
     orientation: 'vertical'
 
     TabbedPanel:
@@ -66,6 +24,7 @@ MainLayout:
                         height: 30
                         halign: 'left'
                         text_size: self.size
+                        color: 1, 1, 0, 1
                     TextInput:
                         id: client_name_input
                         hint_text: 'Nome do Cliente'
@@ -316,3 +275,45 @@ MainLayout:
                     size_hint_y: None
                     height: 40
                     on_press: app.refresh_movements()
+
+# Define a aparência de uma linha na tabela de estoque
+<StockRow@BoxLayout>:
+    product_text: ''
+    kg_text: ''
+    Label:
+        text: root.product_text
+    Label:
+        text: root.kg_text
+        size_hint_x: 0.5
+
+# Define a aparência de uma linha na tabela de logs
+<LogEntryRow@BoxLayout>:
+    id_text: ''
+    type_text: ''
+    client_text: ''
+    farm_text: ''
+    product_text: ''
+    weight_text: ''
+    time_text: ''
+    Label:
+        text: root.id_text
+        size_hint_x: 0.1
+    Label:
+        text: root.type_text
+        size_hint_x: 0.2
+    Label:
+        text: root.client_text
+        size_hint_x: 0.4
+    Label:
+        text: root.farm_text
+        size_hint_x: 0.3
+    Label:
+        # Linha corrigida abaixo
+        text: root.product_text
+        size_hint_x: 0.3
+    Label:
+        text: root.weight_text
+        size_hint_x: 0.2
+    Label:
+        text: root.time_text
+        size_hint_x: 0.5

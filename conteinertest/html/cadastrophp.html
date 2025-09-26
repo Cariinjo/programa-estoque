@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="../css/stylephp.css">
+</head>
+<body>
+    <h1>Cadastro de Usuário</h1>
+    <form action="../php/config_db.php" method="post">
+        <label for="nome">Digite seu nome:</label>
+        <br>
+        <br>
+        <input type="text" name="nome" id="nome">
+        <br>
+        <br>
+        <label for="sobrenome">Digite seu sobrenome:</label>
+        <br>
+        <br>
+        <input type="text" name="sobrenome" id="sobrenome">
+        <br>
+        <br>
+        <label for="idade">Digite sua idade:</label>
+        <br>
+        <br>
+        <input type="number" name="idade" id="idade">
+        <br>
+        <br>
+        <label for="email">Digite seu email:</label>
+        <br>
+        <br>
+        <input type="email" name="email" id="email">
+        <br>
+        <br>
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
