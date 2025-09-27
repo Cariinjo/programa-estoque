@@ -7,7 +7,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #796cf0;
     color: #333;
     line-height: 1.6;
     display: flex;
@@ -19,17 +19,50 @@ body {
 
 /* --- CONTAINER PRINCIPAL --- */
 .container {
-    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #7b4092a6, #46295386);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 700px;
     text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.container2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #7b4092a6, #46295386);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1400px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.container button {
+    margin-bottom: 20px;
+    color: rgb(255, 255, 255);
+    background-color: #007bff65;
+    border-radius: 10px;
+    width: 150px;
+    height: 100px;
+}
+
+.container p {
+    color: #000000;
 }
 
 h1 {
-    color: #0056b3;
+    color: #000000;
     margin-bottom: 25px;
 }
 
@@ -40,14 +73,15 @@ p {
 
 /* --- FORMULÁRIOS E INPUTS --- */
 form {
-    text-align: left;
+    text-align: center;
+
 }
 
 label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #444;
+    color: #000000;
 }
 
 input[type="text"],
@@ -86,6 +120,16 @@ button, a.btn {
     margin-top: 10px;
 }
 
+#voltar {
+    background-color: #1b3852;
+    color: white;
+}
+
+#voltar:hover {
+    background-color: #007bff;
+    color: black;
+}
+
 button:hover, a.btn:hover {
     transform: translateY(-2px);
 }
@@ -98,7 +142,7 @@ button[type="submit"]:hover, .btn-primary:hover {
 }
 
 .btn-secondary {
-    background-color: #6c757d;
+    background-color: #000000;
 }
 .btn-secondary:hover {
     background-color: #5a6268;
@@ -128,11 +172,11 @@ button[type="submit"]:hover, .btn-primary:hover {
 }
 
 #tabelaAlunos tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #6e6e6e83;
 }
 
 #tabelaAlunos tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #414141;
 }
 
 /* --- PÁGINA INICIAL (MENU) --- */

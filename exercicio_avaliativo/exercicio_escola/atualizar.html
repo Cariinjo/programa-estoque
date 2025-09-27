@@ -10,12 +10,16 @@
     <div class="container">
         <h1>Atualizar Aluno</h1>
         <p>Digite o ID do aluno que você deseja atualizar. Você pode ver o ID na página de consulta.</p>
+        
         <form action="atualizar.php" method="POST">
             <label for="id">ID do Aluno:</label>
+            <br>
             <input type="number" id="id" name="id" required>
+            <br><br>
             <button type="submit">Buscar Aluno</button>
-            <a href="index.html" class="btn btn-secondary">Voltar</a>
         </form>
+        <br>
+        <button onclick="location.href='index.html'">Voltar</button>
     </div>
 </body>
 </html>

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deletar Aluno</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <div class="form-container">
         <h1>Deletar Aluno</h1>
         <form action="deletar.php" method="GET">
             <label>Digite o ID do aluno para apagar:</label>
+            <br>
             <input type="number" id="id" name="id" required>
-            <button type="submit" class="btn-primary" style="background-color: #dc3545;">Deletar Aluno</button>
-            <a href="index.html" class="btn btn-secondary">Voltar</a>
+            <br>
+            <br>
+            <button type="submit">Deletar Aluno</button>
         </form>
+        <button onclick="location.href='index.html'">Voltar</button>
     </div>
 </body>
 </html>
