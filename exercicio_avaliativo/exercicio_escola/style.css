@@ -11,26 +11,92 @@ body {
     color: #333;
     line-height: 1.6;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    gap: 20px;
 }
 
 /* --- CONTAINER PRINCIPAL --- */
+.topo {
+    display: flex;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #ffffff36;
+    border-bottom: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#sair {
+    margin-left: auto;
+    background-color: #ff0000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    justify-content: right;
+    align-items: right;
+    text-align: right;
+}
+
+#usuario {
+    justify-content: right;
+    text-align: right;
+    align-items: right;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     background: linear-gradient(to right, #7b4092a6, #46295386);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 700px;
-    text-align: center;
     color: rgb(0, 0, 0);
+}
+
+.container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.container form input {
+    width: 300px;
+    height: 40px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.container2 form input {
+    width: 300px;
+    height: 40px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.container form button {
+    margin-bottom: 20px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: rgb(0, 0, 0);
+    background-color: #007bff65;
+    border-radius: 10px;
+    width: 100px;
+    height: 80px;
 }
 
 .container2 {
@@ -48,13 +114,40 @@ body {
     color: rgb(0, 0, 0);
 }
 
-.container button {
+.container2 button {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
     margin-bottom: 20px;
-    color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     background-color: #007bff65;
     border-radius: 10px;
     width: 150px;
     height: 100px;
+}
+
+.container button {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: rgb(255, 255, 255);
+    background-color: #007bff65;
+    border-radius: 10px;
+    width: 100px;
+    height: 80px;
+}
+
+.aprovado {
+background-color: #757575d0;
+color: #18c540;
+font-weight: bold;
+}
+
+.reprovado {
+background-color: #757575d0;
+color: #d31024;
+font-weight: bold;
 }
 
 .container p {
@@ -106,17 +199,20 @@ input[type="number"]:focus {
 
 /* --- BOTÕES --- */
 button, a.btn {
-    display: inline-block;
+    display: flex;
+    justify-content: left;
+    align-items: left;
     padding: 12px 25px;
     font-size: 16px;
     font-weight: bold;
-    text-align: center;
+    text-align: left;
     text-decoration: none;
     cursor: pointer;
     border: none;
     border-radius: 5px;
     transition: background-color 0.2s ease-in-out, transform 0.1s;
-    color: white;
+    background-color: #ff0000;
+    color: rgb(0, 0, 0);
     margin-top: 10px;
 }
 

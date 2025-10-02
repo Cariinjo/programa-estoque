@@ -129,7 +129,7 @@ $conn->close();
         <?php if ($mensagem && !$erro): ?>
             <button onclick="location.href='consultar.php'">Ver Lista de Alunos</button>
         <?php else: ?>
-            <button onclick="location.href='atualizar.html'">Voltar</button>
+            <button onclick="location.href='atualizarhtml.php'">Voltar</button>
         <?php endif; ?>
     </div>
 </body>

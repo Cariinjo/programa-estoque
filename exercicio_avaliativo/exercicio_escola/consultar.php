@@ -12,7 +12,7 @@
 
         <input type="text" id="campoFiltro" onkeyup="filtrarTabela()" placeholder="Digite um nome para filtrar...">
 
-        <table id="tabelaAlunos">
+        <table id="tabelaAlunos" border="1" cellspacing="0" cellpadding="5">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -27,14 +27,17 @@
                     <th>Geografia</th>
                     <th>Ed. Física</th>
                     <th>Ens. Religioso</th>
+                    <th>Média</th>
+                    <th>Situação</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 include 'banco.php';
 
-                // Junta as tabelas alunos e materias
-                $sql = "SELECT a.id, a.nome, a.turma, a.ano, m.portugues, m.matematica, m.quimica, m.fisica, m.historia, m.geografia, m.ed_fisica, m.ensino_religioso 
+                $sql = "SELECT a.id, a.nome, a.turma, a.ano, 
+                               m.portugues, m.matematica, m.quimica, m.fisica, 
+                               m.historia, m.geografia, m.ed_fisica, m.ensino_religioso
                         FROM alunos a
                         LEFT JOIN materias m ON a.id = m.id_aluno
                         ORDER BY a.nome ASC";
@@ -42,6 +45,28 @@
 
                 if ($resultado->num_rows > 0) {
                     while ($row = $resultado->fetch_assoc()) {
+                        // calcula média
+                        $notas = [
+                            $row['portugues'], $row['matematica'], $row['quimica'],
+                            $row['fisica'], $row['historia'], $row['geografia'],
+                            $row['ed_fisica'], $row['ensino_religioso']
+                        ];
+
+                        $notasValidas = array_filter($notas, fn($v) => $v !== null);
+                        $media = count($notasValidas) > 0 ? round(array_sum($notasValidas) / count($notasValidas), 2) : null;
+
+                        $situacao = "N/A";
+                        $classe = "na";
+                        if ($media !== null) {
+                            if ($media >= 6) {
+                                $situacao = "Aprovado";
+                                $classe = "aprovado";
+                            } else {
+                                $situacao = "Reprovado";
+                                $classe = "reprovado";
+                            }
+                        }
+
                         echo "<tr>";
                         echo "<td>" . $row['id'] . "</td>";
                         echo "<td>" . htmlspecialchars($row['nome']) . "</td>";
@@ -53,20 +78,23 @@
                         echo "<td>" . ($row['fisica'] ?? 'N/A') . "</td>";
                         echo "<td>" . ($row['historia'] ?? 'N/A') . "</td>";
                         echo "<td>" . ($row['geografia'] ?? 'N/A') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['ed_fisica'] ?? 'N/A') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['ensino_religioso'] ?? 'N/A') . "</td>";
+                        echo "<td>" . ($row['ed_fisica'] ?? 'N/A') . "</td>";
+                        echo "<td>" . ($row['ensino_religioso'] ?? 'N/A') . "</td>";
+                        echo "<td>" . ($media !== null ? $media : 'N/A') . "</td>";
+                        echo "<td class='$classe'>" . $situacao . "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='12'>Nenhum aluno cadastrado.</td></tr>";
+                    echo "<tr><td colspan='14'>Nenhum aluno cadastrado.</td></tr>";
                 }
+
                 $conn->close();
                 ?>
             </tbody>
         </table>
 
         <div class="botoes">
-            <button id="voltar" onclick="location.href='index.html'">Voltar</button>
+            <button id="voltar" onclick="location.href='index.php'">Voltar</button>
         </div>
     </div>
 
