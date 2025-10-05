@@ -52,7 +52,7 @@ body {
 
 .container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -63,6 +63,7 @@ body {
     width: 100%;
     max-width: 700px;
     color: rgb(0, 0, 0);
+    gap: 20px;
 }
 
 .container form {

@@ -1,19 +1,18 @@
 <?php
 session_start();
+// Se o usuário não estiver logado, redireciona
 if (!isset($_SESSION['user_id'])) {
-    header('location: login.php?err=Você precisa fazer login');
+    header('location: login.php?err=' . urlencode('Você precisa fazer login'));
     exit();
 }
+
 include 'banco.php';
 
-// Buscar clientes
+// Busca clientes para o dropdown
 $clientes = $conn->query("SELECT id_cliente, nome FROM clientes ORDER BY nome ASC");
 
-// Buscar produtos
+// Busca produtos para o dropdown
 $produtos = $conn->query("SELECT id_produto, nome, medida, preco_venda, quantidade_estoque FROM produtos WHERE quantidade_estoque > 0 ORDER BY nome ASC");
-
-// --- NOVO: Buscar serviços ---
-$servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORDER BY nome ASC");
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -25,17 +24,24 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
         .section-venda { border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
         .section-venda h3 { margin-top: 0; }
         #total-venda { font-size: 1.5em; font-weight: bold; text-align: right; margin-top: 10px; }
+        .servico-inputs { display: flex; gap: 10px; align-items: center; }
+        /* Estilo para o asterisco de campo obrigatório */
+        #cliente-label.required::after { content: " *"; color: red; }
     </style>
 </head>
 <body>
     <div class="container2">
         <h1>Registrar Nova Venda</h1>
 
+        <?php if (isset($_GET['err'])): ?>
+            <p style="color: red; text-align: center;"><?php echo htmlspecialchars($_GET['err']); ?></p>
+        <?php endif; ?>
+
         <form action="venda_action.php" method="POST" id="form-venda">
             <div class="section-venda">
-                <h3>1. Selecione o Cliente</h3>
-                <select name="id_cliente" id="id_cliente" required>
-                    <option value="">-- Escolha um cliente --</option>
+                <h3 id="cliente-label">1. Selecione o Cliente (Opcional)</h3>
+                <select name="id_cliente" id="id_cliente">
+                    <option value="">-- Consumidor Final (Padrão) --</option>
                     <?php while($cliente = $clientes->fetch_assoc()): ?>
                         <option value="<?php echo $cliente['id_cliente']; ?>"><?php echo htmlspecialchars($cliente['nome']); ?></option>
                     <?php endwhile; ?>
@@ -55,36 +61,23 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
                 <input type="number" id="quantidade" placeholder="Qtd" min="1" style="width: 60px;">
                 <button type="button" onclick="adicionarProduto()">Adicionar Produto</button>
                 <hr style="margin: 15px 0;">
-                <select id="servico-select">
-                     <option value="">-- Adicionar um Serviço --</option>
-                    <?php while($servico = $servicos->fetch_assoc()): ?>
-                        <option value="<?php echo $servico['id_servico']; ?>" data-preco="<?php echo $servico['preco_venda']; ?>" data-nome="<?php echo htmlspecialchars($servico['nome']); ?>">
-                            <?php echo htmlspecialchars($servico['nome']); ?>
-                        </option>
-                    <?php endwhile; ?>
-                </select>
-                <button type="button" onclick="adicionarServico()">Adicionar Serviço</button>
+
+                <div class="servico-inputs">
+                    <input type="text" id="servico-descricao" placeholder="Descrição do Serviço Avulso" style="flex-grow: 1;">
+                    <input type="number" id="servico-preco" placeholder="Preço (R$)" step="0.01" min="0">
+                    <button type="button" onclick="adicionarServico()">Adicionar Serviço</button>
+                </div>
             </div>
             
             <div class="section-venda">
                 <h3>3. Itens da Venda</h3>
                 <table id="carrinho" width="100%">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Tipo</th>
-                            <th>Qtd/Preço</th>
-                            <th>Subtotal</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Item</th><th>Tipo</th><th>Qtd/Preço</th><th>Subtotal</th><th>Ação</th></tr></thead>
                     <tbody></tbody>
                 </table>
                 <div id="total-venda">Total: R$ 0,00</div>
             </div>
-            
             <div id="itens-hidden"></div>
-
             <div class="section-venda">
                 <h3>4. Pagamento</h3>
                 <select name="metodo_pagamento" id="metodo_pagamento" required>
@@ -95,18 +88,20 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
                     <option value="Fiado">Fiado (Anotar na conta)</option>
                 </select>
             </div>
-
             <button type="submit" style="padding: 15px; font-size: 1.2em;">Finalizar Venda</button>
+            <br><br>
+            <button type="button" onclick="location.href='index.php'">Cancelar</button>
         </form>
     </div>
 
 <script>
     let itensCarrinho = {};
+    let servicoContador = 0; // Contador para dar IDs únicos aos serviços
 
     function adicionarProduto() {
         const select = document.getElementById('produto-select');
         const option = select.options[select.selectedIndex];
-        const id = 'p_' + option.value; // 'p' para produto
+        const id = 'p_' + option.value;
         const qtdInput = document.getElementById('quantidade');
         const quantidade = parseInt(qtdInput.value);
 
@@ -122,7 +117,7 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
         const newRow = tabelaBody.insertRow();
         newRow.setAttribute('id', 'row-' + id);
         newRow.innerHTML = `
-            <td>${nome}</td>
+            <td>${htmlspecialchars(nome)}</td>
             <td>Produto</td>
             <td>${quantidade} x R$ ${preco.toFixed(2).replace('.', ',')}</td>
             <td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
@@ -136,26 +131,28 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
         `;
         itensCarrinho[id] = true;
         atualizarTotal(subtotal);
-        qtdInput.value = ''; select.selectedIndex = 0;
+        qtdInput.value = ''; 
+        select.selectedIndex = 0;
     }
 
-    // NOVA FUNÇÃO
     function adicionarServico() {
-        const select = document.getElementById('servico-select');
-        const option = select.options[select.selectedIndex];
-        const id = 's_' + option.value; // 's' para serviço
-        
-        if (!option.value) return alert('Selecione um serviço.');
-        if (itensCarrinho[id]) return alert('Serviço já adicionado.');
+        const descricaoInput = document.getElementById('servico-descricao');
+        const precoInput = document.getElementById('servico-preco');
+        const descricao = descricaoInput.value.trim();
+        const preco = parseFloat(precoInput.value);
 
-        const nome = option.getAttribute('data-nome');
-        const preco = parseFloat(option.getAttribute('data-preco'));
+        if (!descricao || !preco || preco <= 0) {
+            return alert('Por favor, preencha a descrição e um preço válido para o serviço.');
+        }
+
+        servicoContador++;
+        const id = 's_' + servicoContador;
         
         const tabelaBody = document.querySelector('#carrinho tbody');
         const newRow = tabelaBody.insertRow();
         newRow.setAttribute('id', 'row-' + id);
         newRow.innerHTML = `
-            <td>${nome}</td>
+            <td>${htmlspecialchars(descricao)}</td>
             <td>Serviço</td>
             <td>R$ ${preco.toFixed(2).replace('.', ',')}</td>
             <td>R$ ${preco.toFixed(2).replace('.', ',')}</td>
@@ -164,12 +161,16 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
 
         document.getElementById('itens-hidden').innerHTML += `
             <div id="hidden-item-${id}">
-                <input type="hidden" name="servicos[]" value="${option.value}">
+                <input type="hidden" name="servicos[${servicoContador}][descricao]" value="${htmlspecialchars(descricao)}">
+                <input type="hidden" name="servicos[${servicoContador}][preco]" value="${preco}">
             </div>
         `;
+        
         itensCarrinho[id] = true;
         atualizarTotal(preco);
-        select.selectedIndex = 0;
+        
+        descricaoInput.value = '';
+        precoInput.value = '';
     }
 
     function removerItem(id, subtotal) {
@@ -181,9 +182,40 @@ $servicos = $conn->query("SELECT id_servico, nome, preco_venda FROM servicos ORD
 
     function atualizarTotal(valor) {
         const totalDiv = document.getElementById('total-venda');
-        let totalAtual = parseFloat(totalDiv.innerText.replace('Total: R$ ', '').replace('.', '').replace(',', '.')) || 0;
+        let totalAtual = parseFloat(totalDiv.innerText.replace('Total: R$ ', '').replace(/\./g, '').replace(',', '.')) || 0;
         totalDiv.innerText = `Total: R$ ${(totalAtual + valor).toFixed(2).replace('.', ',')}`;
     }
+
+    function htmlspecialchars(str) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return str.replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    // Script para tornar o cliente obrigatório apenas para pagamento 'Fiado'
+    document.addEventListener('DOMContentLoaded', () => {
+        const metodoPagamentoSelect = document.getElementById('metodo_pagamento');
+        const clienteSelect = document.getElementById('id_cliente');
+        const clienteLabel = document.getElementById('cliente-label');
+
+        metodoPagamentoSelect.addEventListener('change', function() {
+            if (this.value === 'Fiado') {
+                clienteSelect.required = true;
+                clienteLabel.textContent = '1. Selecione o Cliente (Obrigatório)';
+                clienteLabel.classList.add('required');
+            } else {
+                clienteSelect.required = false;
+                clienteLabel.textContent = '1. Selecione o Cliente (Opcional)';
+                clienteLabel.classList.remove('required');
+            }
+        });
+    });
+
+    document.getElementById('form-venda').addEventListener('submit', function(e){
+        if (Object.keys(itensCarrinho).length === 0) {
+            e.preventDefault();
+            alert('Você precisa adicionar pelo menos um produto ou serviço à venda.');
+        }
+    });
 </script>
 </body>
 </html>

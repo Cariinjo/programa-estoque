@@ -1,0 +1,105 @@
+/* Fonte e fundo geral */
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: linear-gradient(to bottom, #1a1a1a, #2b2b2b);
+    color: #f5f5f5;
+    padding: 40px;
+    text-align: center;
+}
+
+/* Título */
+h1 {
+    font-size: 3rem;
+    color: #ffd700;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 30px;
+}
+
+/* Input e botão */
+input {
+    padding: 10px 15px;
+    width: 250px;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    background-color: #1a1a1a;
+    color: #ffd700;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #ff4500;
+    box-shadow: 0 0 10px #ff4500;
+}
+
+button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ff4500;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #ffd700;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Card do personagem */
+.card {
+    display: inline-block;
+    text-align: center;
+    background: #2b2b2b;
+    border: 2px solid #ffd700;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px #ff4500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 300px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 30px #ffd700;
+}
+
+/* Nome do personagem */
+#hp-nome {
+    font-size: 1.8rem;
+    color: #ffd700;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px #000;
+}
+
+/* Detalhes */
+#hp-casa,
+#hp-varinha {
+    font-size: 1rem;
+    margin: 5px 0;
+    color: #ffdd55;
+}
+
+/* Imagem do personagem */
+#hp-imagem {
+    margin-top: 15px;
+    border-radius: 10px;
+    border: 2px solid #ff4500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#hp-imagem:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ffd700;
+}
+
+/* Esconder card inicialmente */
+.hidden {
+    display: none;
+}

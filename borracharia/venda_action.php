@@ -1,49 +1,67 @@
 <?php
 include 'banco.php';
 session_start();
-if (!isset($_SESSION['user_id'])) exit('Acesso negado.');
+// Apenas usuários logados podem registrar uma venda
+if (!isset($_SESSION['user_id'])) {
+    exit('Acesso negado.');
+}
 
+// Pega os dados do formulário
 $id_cliente = $_POST['id_cliente'] ?? null;
 $metodo_pagamento = $_POST['metodo_pagamento'] ?? null;
 $produtos_venda = $_POST['produtos'] ?? [];
-$servicos_venda = $_POST['servicos'] ?? []; // NOVO
+$servicos_venda = $_POST['servicos'] ?? [];
 
+// --- LÓGICA PARA CLIENTE OPCIONAL ---
+if (empty($id_cliente)) {
+    if ($metodo_pagamento === 'Fiado') {
+        // Se for fiado e não tiver cliente, retorna um erro. A validação JS falhou ou foi burlada.
+        header('Location: vendas.php?err=' . urlencode('Para vendas no fiado, é obrigatório selecionar um cliente.'));
+        exit();
+    }
+    // Se não for fiado e não tiver cliente, usa o ID do "Consumidor Final"
+    // !! IMPORTANTE: Troque o '1' pelo ID do seu cliente "Consumidor Final" !!
+    $id_cliente = 1; 
+}
+// --- FIM DA LÓGICA ---
+
+// Validação final
 if (!$id_cliente || !$metodo_pagamento || (empty($produtos_venda) && empty($servicos_venda))) {
     header('Location: vendas.php?err=Dados da venda incompletos.');
     exit();
 }
 
 $valor_total_venda = 0;
+// Inicia a transação. Ou tudo funciona, ou nada é salvo.
 $conn->begin_transaction();
 
 try {
     // --- CALCULA VALOR TOTAL E VERIFICA ESTOQUE DOS PRODUTOS ---
     foreach ($produtos_venda as $id_produto => $item) {
         $quantidade_vendida = (int)$item['quantidade'];
+
+        // Pega os dados mais recentes do produto do banco e bloqueia a linha para a transação
         $stmt_check = $conn->prepare("SELECT preco_venda, quantidade_estoque FROM produtos WHERE id_produto = ? FOR UPDATE");
         $stmt_check->bind_param("i", $id_produto);
         $stmt_check->execute();
         $produto_db = $stmt_check->get_result()->fetch_assoc();
         $stmt_check->close();
+
         if (!$produto_db || $quantidade_vendida > $produto_db['quantidade_estoque']) {
             throw new Exception("Estoque insuficiente para o produto ID: {$id_produto}.");
         }
+        // Acumula o valor total usando o preço do banco de dados para segurança
         $valor_total_venda += $produto_db['preco_venda'] * $quantidade_vendida;
     }
 
-    // --- NOVO: SOMA O VALOR DOS SERVIÇOS AO TOTAL ---
-    foreach ($servicos_venda as $id_servico) {
-        $stmt_check_serv = $conn->prepare("SELECT preco_venda FROM servicos WHERE id_servico = ?");
-        $stmt_check_serv->bind_param("i", $id_servico);
-        $stmt_check_serv->execute();
-        $servico_db = $stmt_check_serv->get_result()->fetch_assoc();
-        $stmt_check_serv->close();
-        if ($servico_db) {
-            $valor_total_venda += $servico_db['preco_venda'];
+    // --- SOMA O VALOR DOS SERVIÇOS PERSONALIZADOS AO TOTAL ---
+    foreach ($servicos_venda as $servico) {
+        if (isset($servico['preco']) && is_numeric($servico['preco'])) {
+            $valor_total_venda += (float)$servico['preco'];
         }
     }
     
-    // --- 1. INSERE O REGISTRO NA TABELA 'vendas' ---
+    // --- 1. INSERE O REGISTRO PRINCIPAL NA TABELA 'vendas' ---
     $sql_venda = "INSERT INTO vendas (id_cliente, valor_total, metodo_pagamento) VALUES (?, ?, ?)";
     $stmt_venda = $conn->prepare($sql_venda);
     $stmt_venda->bind_param("ids", $id_cliente, $valor_total_venda, $metodo_pagamento);
@@ -54,66 +72,43 @@ try {
     // --- 2. PROCESSA OS PRODUTOS (INSERE ITENS E ATUALIZA ESTOQUE) ---
     foreach ($produtos_venda as $id_produto => $item) {
         $quantidade_vendida = (int)$item['quantidade'];
-        // Pega o preço novamente para garantir consistência
+        
         $stmt_price = $conn->prepare("SELECT preco_venda FROM produtos WHERE id_produto = ?");
         $stmt_price->bind_param("i", $id_produto);
         $stmt_price->execute();
         $preco_unitario = $stmt_price->get_result()->fetch_assoc()['preco_venda'];
         $stmt_price->close();
 
-        // Insere o item da venda
         $stmt_item = $conn->prepare("INSERT INTO venda_itens (id_venda, id_produto, quantidade, preco_unitario_venda) VALUES (?, ?, ?, ?)");
         $stmt_item->bind_param("iiid", $id_nova_venda, $id_produto, $quantidade_vendida, $preco_unitario);
         $stmt_item->execute();
         $stmt_item->close();
 
-        // Atualiza estoque
         $stmt_estoque = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id_produto = ?");
         $stmt_estoque->bind_param("ii", $quantidade_vendida, $id_produto);
         $stmt_estoque->execute();
         $stmt_estoque->close();
     }
 
-    // --- 3. NOVO: PROCESSA OS SERVIÇOS (INSERE NA TABELA venda_servicos) ---
-    foreach ($servicos_venda as $id_servico) {
-        // Pega o preço novamente
-        $stmt_price = $conn->prepare("SELECT preco_venda FROM servicos WHERE id_servico = ?");
-        $stmt_price->bind_param("i", $id_servico);
-        $stmt_price->execute();
-        $preco_cobrado = $stmt_price->get_result()->fetch_assoc()['preco_venda'];
-        $stmt_price->close();
+    // --- 3. PROCESSA OS SERVIÇOS (SALVA A DESCRIÇÃO E PREÇO PERSONALIZADOS) ---
+    foreach ($servicos_venda as $servico) {
+        $descricao = $servico['descricao'];
+        $preco_cobrado = (float)$servico['preco'];
         
-        $stmt_serv = $conn->prepare("INSERT INTO venda_servicos (id_venda, id_servico, preco_cobrado) VALUES (?, ?, ?)");
-        $stmt_serv->bind_param("iid", $id_nova_venda, $id_servico, $preco_cobrado);
+        $stmt_serv = $conn->prepare("INSERT INTO venda_servicos (id_venda, descricao, preco_cobrado) VALUES (?, ?, ?)");
+        $stmt_serv->bind_param("isd", $id_nova_venda, $descricao, $preco_cobrado);
         $stmt_serv->execute();
         $stmt_serv->close();
     }
 
-    // --- 4. ATUALIZA SALDO DO CLIENTE (se for 'Fiado') ---
+    // --- 4. ATUALIZA SALDO DO CLIENTE OU REGISTRA NO CAIXA ---
     if ($metodo_pagamento === 'Fiado') {
         $stmt_cliente = $conn->prepare("UPDATE clientes SET saldo_devedor = saldo_devedor + ? WHERE id_cliente = ?");
         $stmt_cliente->bind_param("di", $valor_total_venda, $id_cliente);
         $stmt_cliente->execute();
         $stmt_cliente->close();
-    }
-    
-    $conn->commit();
-    header('Location: relatorios.php?msg=Venda registrada com sucesso!');
-} catch (Exception $e) {
-    $conn->rollback();
-    header('Location: vendas.php?err=' . urlencode($e->getMessage()));
-}
-
-// ... (código existente no início) ...
-
-try {
-    // ... (todo o código de cálculo e inserção de vendas/itens/serviços) ...
-    
-    // --- 4. ATUALIZA SALDO DO CLIENTE (se for 'Fiado') ---
-    if ($metodo_pagamento === 'Fiado') {
-        // ... (código de update do saldo devedor) ...
     } else {
-        // NOVO: SE A VENDA FOI PAGA, REGISTRA A ENTRADA NO CAIXA
+        // Se a venda foi paga (não é fiado), registra a entrada no caixa
         $descricao_caixa = "Recebimento da Venda #" . $id_nova_venda;
         $stmt_caixa = $conn->prepare("INSERT INTO fluxo_caixa (tipo, descricao, valor, id_venda_associada) VALUES ('Entrada', ?, ?, ?)");
         $stmt_caixa->bind_param("sdi", $descricao_caixa, $valor_total_venda, $id_nova_venda);
@@ -121,11 +116,14 @@ try {
         $stmt_caixa->close();
     }
     
+    // Se tudo deu certo até aqui, confirma as alterações no banco de dados
     $conn->commit();
     header('Location: relatorios.php?msg=Venda registrada com sucesso!');
 
 } catch (Exception $e) {
-    // ... (código do catch) ...
+    // Se qualquer etapa falhou, desfaz todas as operações
+    $conn->rollback();
+    header('Location: vendas.php?err=' . urlencode($e->getMessage()));
 }
 
 $conn->close();
