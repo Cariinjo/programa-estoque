@@ -1,6 +1,9 @@
 <?php
 require_once 'includes/config.php';
 
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$category = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+
 // Buscar categorias
 $stmt = $pdo->query("SELECT * FROM categorias LIMIT 4");
 $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -46,14 +49,7 @@ $prestadores_destaque = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <h1>Conectando Talentos e Oportunidades</h1>
             <p>Encontre serviços de qualidade oferecidos por alunos formados do SENAC ou divulgue seus talentos e conquiste novos clientes.</p>
             
-            <div class="search-container">
-                <form action="servicos.php" method="GET">
-                    <input type="text" name="busca" class="search-box" placeholder="O que você está procurando?">
-                    <button type="submit" class="search-btn">
-                        <i class="fas fa-search"></i> Buscar
-                    </button>
-                </form>
-            </div>
+            
         </div>
     </section>
 
@@ -99,7 +95,24 @@ $prestadores_destaque = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($servicos_destaque as $servico): ?>
                 <div class="service-card">
                     <div class="service-image">
-                        <!-- Placeholder para imagem do serviço -->
+                        <div class="service-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; display: flex; align-items: center; justify-content: center; color: white;">
+    <?php
+    $categoryIcons = [
+        'Saúde e Bem-Estar' => 'fas fa-heartbeat',
+        'Desenvolvimento' => 'fas fa-code',
+        'Marketing Digital' => 'fas fa-bullhorn',
+        'Beleza e Estética' => 'fas fa-cut',
+        'Design Gráfico' => 'fas fa-palette',
+        'Fotografia e Vídeo' => 'fas fa-camera',
+        'Aulas Particulares' => 'fas fa-chalkboard-teacher',
+        'Consultoria' => 'fas fa-handshake'
+    ];
+    
+    // Usa o ícone da categoria ou um ícone padrão se não encontrar
+    $icon = $categoryIcons[$servico['nome_categoria']] ?? 'fas fa-star';
+    ?>
+    <i class="<?= $icon ?>" style="font-size: 3rem;"></i>
+</div>
                     </div>
                     <div class="service-content">
                         <h3 class="service-title"><?= htmlspecialchars($servico['titulo']) ?></h3>
@@ -123,7 +136,7 @@ $prestadores_destaque = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <span class="rating-text">(<?= $servico['total_avaliacoes'] ?> avaliações)</span>
                         </div>
                         <p><strong>Por:</strong> <?= htmlspecialchars($servico['nome_profissional']) ?></p>
-                        <a href="servico-detalhes.php?id=<?= $servico['id_servico'] ?>" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 1rem;">Ver Detalhes</a>
+                        <a href="servico-detalhes.php?id=<?= $servico['id_servico'] ?>" class="btn btn-primary" style="width: 100%; background-color: blue; text-align: center; margin-top: 1rem;">Ver Detalhes</a>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -163,7 +176,7 @@ $prestadores_destaque = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <span class="rating-text">(<?= $prestador['total_avaliacoes'] ?> avaliações)</span>
                     </div>
-                    <a href="profissional-perfil.php?id=<?= $prestador['id_profissional'] ?>" class="btn btn-primary" style="margin-top: 1rem;">Ver Perfil</a>
+                    <a href="profissional-perfil.php?id=<?= $prestador['id_profissional'] ?>" class="btn btn-primary" style="margin-top: 1rem; background-color: blue;">Ver Perfil</a>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -221,10 +234,10 @@ $prestadores_destaque = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="footer-section">
                     <h3>Categorias</h3>
                     <ul>
-                        <li><a href="categoria.php?id=1">Saúde e Bem-Estar</a></li>
-                        <li><a href="categoria.php?id=2">Desenvolvimento</a></li>
-                        <li><a href="categoria.php?id=3">Marketing Digital</a></li>
-                        <li><a href="categoria.php?id=4">Design Gráfico</a></li>
+                        <li><a href="admin/categorias.php?id=1">Saúde e Bem-Estar</a></li>
+                        <li><a href="admin/categorias.php?id=2">Desenvolvimento</a></li>
+                        <li><a href="admin/categorias.php?id=3">Marketing Digital</a></li>
+                        <li><a href="admin/categorias.php?id=4">Design Gráfico</a></li>
                     </ul>
                 </div>
                 

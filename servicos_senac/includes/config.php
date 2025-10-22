@@ -2,8 +2,8 @@
 // Configurações do banco de dados
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'servicos_senac');
-define('DB_USER', 'senac');
-define('DB_PASS', 'senac123');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 
 // Configurações gerais
 define('SITE_URL', 'http://localhost');

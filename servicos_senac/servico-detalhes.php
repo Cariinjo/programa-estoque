@@ -98,7 +98,7 @@ $page_title = htmlspecialchars($servico['titulo']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $page_title ?> - Serviços SENAC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="./css/style.css">
     <style>
         .service-detail-container {
             max-width: 1200px;
@@ -346,25 +346,26 @@ $page_title = htmlspecialchars($servico['titulo']);
         
         .btn-primary {
             background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
-            color: white;
+            color: blue !important;
             box-shadow: 0 5px 20px rgba(108, 92, 231, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(108, 92, 231, 0.4);
-            color: white;
+            color: blue;
+            
         }
         
         .btn-outline {
             background: transparent;
-            color: #6c5ce7;
+            color: #6c5ce7 !important;
             border: 2px solid #6c5ce7;
         }
         
         .btn-outline:hover {
             background: #6c5ce7;
-            color: white;
+            color: #000000ff;
             transform: translateY(-2px);
         }
         
@@ -794,11 +795,11 @@ $page_title = htmlspecialchars($servico['titulo']);
                                     <i class="fas fa-shopping-cart"></i> Contratar Serviço
                                 </button>
                                 <button class="btn btn-outline btn-full" onclick="iniciarChat(<?= $servico['id_profissional'] ?>)">
-                                    <i class="fas fa-comments"></i> Chat com Profissional
+                                    <i class="fas fa-comments">Chat com Profissional</i> 
                                 </button>
                                 <div class="contact-actions">
                                     <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $servico['telefone']) ?>" target="_blank" class="btn btn-whatsapp" style="flex: 1;">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
+                                        <i class="fab fa-whatsapp"> WhatsApp</i>
                                     </a>
                                     <button class="btn btn-success" onclick="ligarProfissional('<?= htmlspecialchars($servico['telefone']) ?>')" style="flex: 1;">
                                         <i class="fas fa-phone"></i> Ligar

@@ -70,7 +70,7 @@ body {
 
 .btn-outline {
     background: transparent;
-    color: white;
+    color: rgb(8, 5, 5);
     border: 2px solid white;
 }
 
@@ -81,7 +81,7 @@ body {
 
 .btn-primary {
     background: #007bff;
-    color: white;
+    color: rgb(8, 6, 6);
 }
 
 .btn-primary:hover {

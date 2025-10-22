@@ -183,9 +183,7 @@ if ($user_name) {
                             </div>
                         </div>
                     </div>
-                    <div class="notifications-footer">
-                        <a href="notificacoes.php">Ver todas as notificações</a>
-                    </div>
+
                 </div>
 
             <?php else: ?>

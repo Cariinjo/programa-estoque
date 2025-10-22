@@ -1,13 +1,15 @@
+
+
 <div id="orcamentoModal" class="modal">
     <div class="modal-content">
         <span class="close-button">&times;</span>
         <h2>Solicitar Orçamento</h2>
         <p>Preencha os detalhes para solicitar um orçamento para o serviço: <strong id="modalServicoTitulo"></strong></p>
-        <form id="orcamentoForm">
+        <form id="orcamentoForm" >
             <input type="hidden" id="modalServicoId" name="servico_id">
             <div class="form-group">
                 <label for="descricaoOrcamento">Descreva o que você precisa:</label>
-                <textarea id="descricaoOrcamento" name="descricao" rows="5" placeholder="Ex: Preciso de um logo para minha empresa de tecnologia, com cores vibrantes e um ícone que remeta a inovação." required></textarea>
+                <textarea id="descricaoOrcamento" name="descricao" rows="5" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Enviar Solicitação</button>
             <div id="orcamentoMessage" class="message-area"></div>
@@ -172,13 +174,16 @@
             const servico_id = modalServicoId.value;
             const descricao = descricaoOrcamento.value;
 
-            fetch('api/solicitar-orcamento.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ servico_id, descricao })
-            })
+           fetch('api/solicitar-orcamento.php', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        id_servico: servico_id,
+        detalhes_solicitacao: descricao
+    })
+})
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -188,7 +193,7 @@
                     setTimeout(() => {
                         modal.style.display = 'none';
                         // Redirecionar para meus orçamentos ou dashboard
-                        window.location.href = 'meus-orcamentos.php';
+                        window.location.href = 'meus-orcamentos.php'; 
                     }, 2000);
                 } else {
                     orcamentoMessage.textContent = data.error;
