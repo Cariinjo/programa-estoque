@@ -499,7 +499,7 @@ try {
                 <a href="meus-orcamentos.php" class="action-button">
                     <i class="fas fa-file-invoice"></i> Orçamentos Recebidos
                 </a>
-                <a href="perfil.php" class="action-button">
+                <a href="editar-perfil.php" class="action-button">
                     <i class="fas fa-user-edit"></i> Editar Perfil
                 </a>
             </div>

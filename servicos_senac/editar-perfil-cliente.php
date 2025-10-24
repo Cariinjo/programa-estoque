@@ -50,26 +50,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$nome, $email, $telefone, $whatsapp, $endereco_completo, $cep, $cidade_id, $data_nascimento, $user_id]);
         
-        // Processar upload de foto se enviada
-        if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = 'uploads/perfis/';
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-            }
-            
-            $file_extension = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-            
-            if (in_array($file_extension, $allowed_extensions)) {
-                $new_filename = 'cliente_' . $user_id . '_' . time() . '.' . $file_extension;
-                $upload_path = $upload_dir . $new_filename;
-                
-                if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $upload_path)) {
-                    $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
-                    $stmt->execute([$upload_path, $user_id]);
-                }
-            }
+// Processar upload de foto se enviada
+if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+    $upload_dir = 'uploads/perfis/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    $file_extension = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (in_array($file_extension, $allowed_extensions)) {
+        // Nome do arquivo será só o ID do usuário
+        $new_filename = $user_id . '.' . $file_extension;
+        $upload_path = $upload_dir . $new_filename;
+        
+        if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $upload_path)) {
+            // Salvar o caminho no banco
+            $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
+            $stmt->execute([$upload_path, $user_id]);
         }
+    }
+}
+
         
         $pdo->commit();
         
@@ -441,7 +444,7 @@ try {
                 </div>
                 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-secondary">
                         <i class="fas fa-save"></i> Salvar Alterações
                     </button>
                     <a href="dashboard.php" class="btn btn-secondary">

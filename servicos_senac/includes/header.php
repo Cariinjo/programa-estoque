@@ -1,9 +1,31 @@
 <?php
-// Verificar se o usuário está logado e obter informações
+// --- BLOCO PHP CORRIGIDO (com base no seu resumo) ---
 $user_logged = isLoggedIn();
 $user_name = $user_logged ? $_SESSION['user_name'] : '';
 $user_type = $user_logged ? $_SESSION['user_type'] : '';
-$user_avatar = $user_logged ? (isset($_SESSION['user_avatar']) ? $_SESSION['user_avatar'] : '') : '';
+$user_avatar = ''; // Inicia a variável
+
+// Lógica do Avatar (Seguindo o Resumo)
+if ($user_logged && !empty($_SESSION['user_id'])) {
+    
+    // 1. Pegar o user_id da sessão
+    $user_id = $_SESSION['user_id'];
+    
+    // 2. Construir o caminho do avatar conforme o resumo: uploads/perfis/{id}.png
+    $potential_avatar_path = "uploads/perfis/" . htmlspecialchars($user_id) . ".png"; // <-- CORREÇÃO
+    
+    // 3. Verificar se o arquivo realmente existe
+    if (file_exists($potential_avatar_path)) {
+        $user_avatar = $potential_avatar_path;
+    } else {
+        // Se o arquivo não existe, usa o default
+        $user_avatar = 'uploads/perfis/default.png'; // <-- CORREÇÃO
+    }
+
+} else {
+    // 4. Usuário não logado, usa o default
+    $user_avatar = 'uploads/perfis/default.png'; // <-- CORREÇÃO
+}
 
 // Gerar iniciais do nome para avatar
 $user_initials = '';
@@ -14,11 +36,11 @@ if ($user_name) {
         $user_initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
     }
 }
+// --- FIM DO BLOCO PHP CORRIGIDO ---
 ?>
 
 <header class="modern-header">
     <div class="header-container">
-        <!-- Logo e Brand -->
         <div class="header-brand">
             <a href="index.php" class="brand-link">
                 <div class="brand-logo">
@@ -31,7 +53,6 @@ if ($user_name) {
             </a>
         </div>
 
-        <!-- Navegação Principal -->
         <nav class="header-nav" id="header-nav">
             <div class="nav-links">
                 <a href="index.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
@@ -57,20 +78,23 @@ if ($user_name) {
             </div>
         </nav>
 
-        <!-- Ações do Usuário -->
         <div class="header-actions">
             <?php if ($user_logged): ?>
-                <!-- Usuário Logado -->
                 <div class="user-menu-container">
-                    <!-- Notificações -->
                     <div class="notification-btn" onclick="toggleNotifications()">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </div>
 
-                    <!-- Menu do Usuário -->
                     <div class="user-menu" onclick="toggleUserMenu()">
                         <div class="user-avatar">
+                            <?php 
+                            // Esta lógica usa a variável $user_avatar corrigida.
+                            // Seu resumo não mencionava o uso de iniciais se a imagem existisse,
+                            // então esta lógica prioriza a imagem.
+                            // Se $user_avatar for uma string vazia (o que não deve acontecer com a lógica acima)
+                            // ele cairia no 'else'.
+                            ?>
                             <?php if ($user_avatar): ?>
                                 <img src="<?= htmlspecialchars($user_avatar) ?>" alt="Avatar">
                             <?php else: ?>
@@ -97,7 +121,6 @@ if ($user_name) {
                         <i class="fas fa-chevron-down dropdown-icon"></i>
                     </div>
 
-                    <!-- Dropdown do Usuário -->
                     <div class="user-dropdown" id="user-dropdown">
                         <?php if ($user_type === 'admin'): ?>
                             <a href="admin/dashboard.php" class="dropdown-item">
@@ -148,7 +171,6 @@ if ($user_name) {
                     </div>
                 </div>
 
-                <!-- Painel de Notificações -->
                 <div class="notifications-panel" id="notifications-panel">
                     <div class="notifications-header">
                         <h3>Notificações</h3>
@@ -187,7 +209,6 @@ if ($user_name) {
                 </div>
 
             <?php else: ?>
-                <!-- Usuário Não Logado -->
                 <div class="auth-buttons">
                     <a href="login.php" class="btn btn-outline">
                         <i class="fas fa-sign-in-alt"></i>
@@ -220,7 +241,6 @@ if ($user_name) {
             <?php endif; ?>
         </div>
 
-        <!-- Botão Mobile Menu -->
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
             <span></span>
             <span></span>
@@ -228,7 +248,6 @@ if ($user_name) {
         </button>
     </div>
 
-    <!-- Overlay para fechar menus -->
     <div class="header-overlay" id="header-overlay" onclick="closeAllMenus()"></div>
 </header>
 
@@ -517,10 +536,11 @@ if ($user_name) {
     background: rgba(255,255,255,0.25);
 }
 
+/* --- ESTILO DO AVATAR CORRIGIDO (conforme seu resumo) --- */
 .user-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
+    border-radius: 50%; /* <-- CORREÇÃO: 50% para ser redondo */
     overflow: hidden;
     background: rgba(255,255,255,0.2);
     display: flex;
@@ -531,8 +551,9 @@ if ($user_name) {
 .user-avatar img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* <-- CORREÇÃO: como pedido no resumo */
 }
+/* --- FIM DA CORREÇÃO DO AVATAR --- */
 
 .avatar-initials {
     color: white;
@@ -875,4 +896,4 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
-
+```

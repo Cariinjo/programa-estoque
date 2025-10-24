@@ -419,7 +419,7 @@ try {
                         <a href="dashboard.php" class="btn-secondary">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </a>
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" class="btn-secondary">
                             <i class="fas fa-save"></i> Salvar Alterações
                         </button>
                     </div>
