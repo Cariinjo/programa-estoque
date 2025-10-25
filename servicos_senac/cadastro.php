@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $userId = $pdo->lastInsertId();
                 
                 // Se for profissional, inserir na tabela profissionais
-                if ($tipo_usuario === 'profissional') {
+                if ($tipo_usuario === 'prestador') {
                     $cpf = sanitize($_POST['cpf']);
                     $id_categoria = $_POST['id_categoria'];
                     $descricao_perfil = sanitize($_POST['descricao_perfil']);
@@ -291,8 +291,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>Quero contratar serviços</p>
                 </label>
                 
-                <label class="user-type-option <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'profissional') ? 'active' : '' ?>">
-                    <input type="radio" name="tipo_usuario" value="profissional" <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'profissional') ? 'checked' : '' ?>>
+                <label class="user-type-option <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'prestador') ? 'active' : '' ?>">
+                    <input type="radio" name="tipo_usuario" value="prestador" <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'prestador') ? 'checked' : '' ?>>
                     <i class="fas fa-briefcase" style="font-size: 2rem; color: #6c5ce7; margin-bottom: 0.5rem;"></i>
                     <h3>Profissional</h3>
                     <p>Quero oferecer serviços</p>
@@ -335,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
             
-            <div class="professional-fields <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'profissional') ? 'active' : '' ?>">
+            <div class="professional-fields <?= (isset($_POST['tipo_usuario']) && $_POST['tipo_usuario'] === 'prestador') ? 'active' : '' ?>">
                 <h3 style="margin-bottom: 1rem; color: #2d3436;">Informações Profissionais</h3>
                 
                 <div class="form-row">
@@ -391,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const radioInput = this.querySelector('input[type="radio"]');
                 radioInput.checked = true;
                 
-                if (radioInput.value === 'profissional') {
+                if (radioInput.value === 'prestador') {
                     professionalFields.classList.add('active');
                     // Tornar campos obrigatórios
                     document.getElementById('cpf').required = true;

@@ -470,16 +470,14 @@
             <div class="cta-section">
                 <h2 class="cta-title">Pronto para Começar?</h2>
                 <p class="cta-description">
-                    Junte-se à nossa comunidade de profissionais qualificados e clientes satisfeitos. 
+                    Junte-se à nossa comunidade de profissionais qualificados e clientes. 
                     Cadastre-se agora e descubra as oportunidades que esperam por você.
                 </p>
                 <div class="cta-buttons">
-                    <a href="cadastro.php?type=client" class="cta-button">
-                        <i class="fas fa-user-plus"></i> Sou Cliente
+                    <a href="cadastro.php?" class="cta-button">
+                        <i class="fas fa-user-plus"></i> Cadastrar
                     </a>
-                    <a href="cadastro.php?type=professional" class="cta-button">
-                        <i class="fas fa-briefcase"></i> Sou Profissional
-                    </a>
+
                 </div>
             </div>
             

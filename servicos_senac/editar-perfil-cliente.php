@@ -50,28 +50,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$nome, $email, $telefone, $whatsapp, $endereco_completo, $cep, $cidade_id, $data_nascimento, $user_id]);
         
-// Processar upload de foto se enviada
-if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-    $upload_dir = 'uploads/perfis/';
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
-    }
-    
-    $file_extension = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
-    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-    
-    if (in_array($file_extension, $allowed_extensions)) {
-        // Nome do arquivo será só o ID do usuário
-        $new_filename = $user_id . '.' . $file_extension;
-        $upload_path = $upload_dir . $new_filename;
-        
-        if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $upload_path)) {
-            // Salvar o caminho no banco
-            $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
-            $stmt->execute([$upload_path, $user_id]);
+        // Processar upload de foto se enviada
+        if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = 'uploads/perfis/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+            }
+            
+            $file_extension = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+            
+            if (in_array($file_extension, $allowed_extensions)) {
+                // Nome do arquivo será só o ID do usuário
+                $new_filename = $user_id . '.' . $file_extension;
+                $upload_path = $upload_dir . $new_filename;
+                
+                if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $upload_path)) {
+                    // Salvar o caminho no banco
+                    $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
+                    $stmt->execute([$upload_path, $user_id]);
+                }
+            }
         }
-    }
-}
 
         
         $pdo->commit();
@@ -82,7 +82,11 @@ if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_
         $success_message = 'Perfil atualizado com sucesso!';
         
     } catch (Exception $e) {
-        $pdo->rollBack();
+        // CORREÇÃO APLICADA AQUI:
+        // Só executa o rollBack SE uma transação estiver ativa
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         $error_message = $e->getMessage();
     }
 }
@@ -370,7 +374,6 @@ try {
             <?php endif; ?>
             
             <form method="POST" enctype="multipart/form-data">
-                <!-- Foto de Perfil -->
                 <div class="form-group form-group-full">
                     <label>Foto de Perfil</label>
                     <div class="photo-upload">
@@ -390,7 +393,6 @@ try {
                     </div>
                 </div>
                 
-                <!-- Dados Pessoais -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="nome">Nome Completo *</label>
@@ -430,7 +432,6 @@ try {
                     </div>
                 </div>
                 
-                <!-- Endereço -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="cep">CEP</label>
@@ -444,7 +445,7 @@ try {
                 </div>
                 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-secondary">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Salvar Alterações
                     </button>
                     <a href="dashboard.php" class="btn btn-secondary">
@@ -521,4 +522,3 @@ try {
     </script>
 </body>
 </html>
-

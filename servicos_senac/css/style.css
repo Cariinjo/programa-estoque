@@ -80,7 +80,7 @@ body {
 }
 
 .btn-primary {
-    background: #007bff;
+    background: #007bff !important;
     color: rgb(8, 6, 6);
 }
 

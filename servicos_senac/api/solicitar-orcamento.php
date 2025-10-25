@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id']; // ID do cliente logado
 
 // Obter dados do POST (JSON ou form-data)
 $input = json_decode(file_get_contents('php://input'), true);
@@ -48,9 +48,9 @@ if (empty($detalhes_solicitacao)) {
 }
 
 try {
-    // Verificar se o serviço existe e está ativo
+    // 1. Verificar se o serviço existe e pegar dados do prestador
     $stmt = $pdo->prepare("
-        SELECT s.*, p.id_profissional, u.nome as prestador_nome
+        SELECT s.*, p.id_profissional, p.id_usuario as id_usuario_prestador, u.nome as prestador_nome
         FROM servicos s
         JOIN profissionais p ON s.id_profissional = p.id_profissional
         JOIN usuarios u ON p.id_usuario = u.id_usuario
@@ -64,7 +64,10 @@ try {
         exit;
     }
     
-    // Verificar se já existe um orçamento pendente para este serviço e cliente
+    $id_profissional_servico = $servico['id_profissional'];
+    $id_usuario_prestador = $servico['id_usuario_prestador']; // ID do usuário que receberá a notificação
+
+    // 2. Verificar se já existe um orçamento pendente
     $stmt = $pdo->prepare("
         SELECT id_orcamento FROM orcamentos 
         WHERE id_servico = ? AND id_cliente = ? AND status IN ('pendente', 'respondido')
@@ -78,7 +81,7 @@ try {
     
     $pdo->beginTransaction();
     
-    // Inserir novo orçamento
+    // 3. Inserir novo orçamento
     $stmt = $pdo->prepare("
         INSERT INTO orcamentos (
             id_servico, 
@@ -94,8 +97,8 @@ try {
     
     $stmt->execute([
         $id_servico,
-        $user_id,
-        $servico['id_profissional'],
+        $user_id, // id_cliente
+        $id_profissional_servico, // id_profissional
         $detalhes_solicitacao,
         $prazo_desejado,
         $orcamento_maximo
@@ -103,29 +106,29 @@ try {
     
     $orcamento_id = $pdo->lastInsertId();
     
-    // Criar notificação para o prestador
-    $stmt = $pdo->prepare("
-        INSERT INTO notificacoes (usuario_id, tipo, titulo, mensagem, created_at)
-        VALUES (?, 'orcamento_novo', 'Nova Solicitação de Orçamento', ?, NOW())
-    ");
-    
-    $mensagem = "Você recebeu uma nova solicitação de orçamento para o serviço \"{$servico['titulo']}\"";
-    $stmt->execute([
-        $servico['id_profissional'], // Usar o ID do usuário prestador, não do profissional
-        $mensagem
-    ]);
-    
-    // Buscar o ID do usuário prestador
-    $stmt = $pdo->prepare("SELECT id_usuario FROM profissionais WHERE id_profissional = ?");
-    $stmt->execute([$servico['id_profissional']]);
-    $prestador_user_id = $stmt->fetchColumn();
-    
-    if ($prestador_user_id) {
-        $stmt = $pdo->prepare("
-            INSERT INTO notificacoes (usuario_id, tipo, titulo, mensagem, created_at)
-            VALUES (?, 'orcamento_novo', 'Nova Solicitação de Orçamento', ?, NOW())
+    // 4. Criar notificação para o prestador (BLOCO CORRIGIDO)
+    if ($id_usuario_prestador) {
+        
+        // Definir a mensagem e o link
+        $mensagem = "Você recebeu uma nova solicitação de orçamento para o serviço \"{$servico['titulo']}\".";
+        $link_acao = "orcamentos.php?id=" . $orcamento_id;
+
+        // Inserir na tabela 'notificacoes' com os nomes corretos
+        $stmt_notif = $pdo->prepare("
+            INSERT INTO notificacoes (
+                id_usuario_destino, 
+                tipo_notificacao, 
+                mensagem, 
+                link_acao, 
+                data_criacao
+            ) VALUES (?, 'orcamento_novo', ?, ?, NOW())
         ");
-        $stmt->execute([$prestador_user_id, $mensagem]);
+        
+        $stmt_notif->execute([
+            $id_usuario_prestador,
+            $mensagem,
+            $link_acao
+        ]);
     }
     
     $pdo->commit();
@@ -139,7 +142,7 @@ try {
     
 } catch (PDOException $e) {
     $pdo->rollBack();
-    error_log("Erro ao solicitar orçamento: " . $e->getMessage());
+    error_log("Erro ao solicitar orçamento (PDO): " . $e->getMessage());
     echo json_encode([
         'success' => false, 
         'message' => 'Erro interno do servidor. Tente novamente.',
@@ -155,4 +158,3 @@ try {
     ]);
 }
 ?>
-

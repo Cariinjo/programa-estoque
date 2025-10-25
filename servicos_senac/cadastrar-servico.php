@@ -18,48 +18,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $descricao = trim($_POST['descricao'] ?? '');
         $categoria_id = (int)($_POST['categoria_id'] ?? 0);
         $preco = (float)($_POST['preco'] ?? 0);
+        
+        // --- CORREÇÃO 1: O nome do campo no HTML é 'prazo_execucao' ---
         $prazo_execucao = (int)($_POST['prazo_execucao'] ?? 0);
-        $tipo_preco = $_POST['tipo_preco'] ?? 'fixo';
+        
+        $tipo_preco = $_POST['tipo_preco'] ?? 'fixo'; // 'fixo' ou 'negociavel'
         $disponibilidade = $_POST['disponibilidade'] ?? 'disponivel';
         
         // Validações
         if (empty($titulo) || empty($descricao)) {
             throw new Exception('Título e descrição são obrigatórios');
         }
-        
         if ($categoria_id <= 0) {
             throw new Exception('Selecione uma categoria');
         }
-        
         if ($preco <= 0) {
             throw new Exception('Preço deve ser maior que zero');
         }
-        
         if ($prazo_execucao <= 0) {
             throw new Exception('Prazo de execução deve ser maior que zero');
         }
         
-        // Buscar ID do profissional
-        $stmt = $pdo->prepare("SELECT id_profissional FROM profissionais WHERE id_usuario = ?");
+        // --- CORREÇÃO 2: Buscar ID do profissional E ID da cidade ---
+        // (Assumindo que 'cidade_id' está na tabela 'profissionais' e tem o mesmo nome)
+        $stmt = $pdo->prepare("SELECT id_profissional, cidade_id FROM profissionais WHERE id_usuario = ?");
         $stmt->execute([$user_id]);
-        $prestador_id = $stmt->fetchColumn();
+        $profissional_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $prestador_id = $profissional_data['id_profissional'] ?? null;
+        $cidade_id_prestador = $profissional_data['cidade_id'] ?? null; // <-- NOVO
         
         if (!$prestador_id) {
             throw new Exception('Prestador não encontrado');
         }
+
+        // --- NOVO: Validar se a cidade do prestador existe ---
+        if (empty($cidade_id_prestador)) {
+            throw new Exception('A cidade do seu perfil não está configurada. Atualize seu perfil.');
+        }
+
+        // --- CORREÇÃO 3: Mapear 'tipo_preco' (string) para 'tipo_servico' (int) ---
+        // (Assumindo 1 = fixo, 2 = negociavel, com base na sua tabela)
+        $tipo_servico_int = ($tipo_preco === 'fixo') ? 1 : 2;
         
         $pdo->beginTransaction();
         
-        // Inserir serviço
+        // --- CORREÇÃO 4: Atualizar o INSERT para usar 'tipo_servico' e 'cidade_id' ---
         $stmt = $pdo->prepare("
             INSERT INTO servicos (
                 id_profissional, id_categoria, titulo, descricao, preco, 
-                prazo_execucao, tipo_preco, status_servico, data_criacao
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ativo', NOW())
+                tempo_entrega, tipo_servico, status_servico, data_criacao, cidade_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ativo', NOW(), ?)
         ");
+        
         $stmt->execute([
-            $prestador_id, $categoria_id, $titulo, $descricao, $preco, 
-            $prazo_execucao, $tipo_preco
+            $prestador_id, 
+            $categoria_id, 
+            $titulo, 
+            $descricao, 
+            $preco, 
+            $prazo_execucao, 
+            $tipo_servico_int,      // <-- Valor mapeado
+            $cidade_id_prestador    // <-- Novo valor
         ]);
         
         $servico_id = $pdo->lastInsertId();
@@ -83,11 +103,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $upload_path = $upload_dir . $new_filename;
                         
                         if (move_uploaded_file($_FILES['imagens']['tmp_name'][$i], $upload_path)) {
-                            $stmt = $pdo->prepare("
+                            // (Assumindo que sua tabela de imagens se chama 'servico_imagens')
+                            $stmt_img = $pdo->prepare("
                                 INSERT INTO servico_imagens (id_servico, caminho_imagem, ordem) 
                                 VALUES (?, ?, ?)
                             ");
-                            $stmt->execute([$servico_id, $upload_path, $i + 1]);
+                            $stmt_img->execute([$servico_id, $upload_path, $i + 1]);
                         }
                     }
                 }
@@ -102,7 +123,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("refresh:2;url=meus-servicos.php");
         
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         $error_message = $e->getMessage();
     }
 }
@@ -129,6 +152,7 @@ try {
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* (Seu CSS completo vem aqui - Nenhuma alteração necessária) */
         .cadastro-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -411,17 +435,15 @@ try {
     </style>
 </head>
 <body>
-    <?php include 'includes/header-prestador.php'; ?>
+    <?php include 'includes/header-prestador.php'; // (Certifique-se que este arquivo existe) ?>
     
     <div class="cadastro-container">
-        <!-- Header da Página -->
         <div class="page-header">
             <h1><i class="fas fa-plus-circle"></i> Cadastrar Novo Serviço</h1>
             <p>Adicione um novo serviço ao seu portfólio</p>
         </div>
         
         <div class="form-card">
-            <!-- Alertas -->
             <?php if ($success_message): ?>
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i> <?= htmlspecialchars($success_message) ?>
@@ -435,7 +457,6 @@ try {
             <?php endif; ?>
             
             <form method="POST" enctype="multipart/form-data">
-                <!-- Informações Básicas -->
                 <div class="form-grid">
                     <div class="form-group form-group-full">
                         <label for="titulo">Título do Serviço <span class="required">*</span></label>
@@ -483,7 +504,6 @@ try {
                     </div>
                 </div>
                 
-                <!-- Descrição -->
                 <div class="form-group form-group-full">
                     <label for="descricao">Descrição Detalhada <span class="required">*</span></label>
                     <textarea id="descricao" name="descricao" required maxlength="1000" 
@@ -491,7 +511,6 @@ try {
                     <div class="help-text">Seja específico sobre o que está incluído e o que não está</div>
                 </div>
                 
-                <!-- Upload de Imagens -->
                 <div class="form-group form-group-full">
                     <label>Imagens do Serviço (opcional)</label>
                     <div class="image-upload" id="imageUpload">
@@ -510,7 +529,6 @@ try {
                     <div class="preview-images" id="previewImages"></div>
                 </div>
                 
-                <!-- Ações -->
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Cadastrar Serviço
@@ -617,6 +635,8 @@ try {
             const descricao = document.getElementById('descricao').value.trim();
             const categoria = document.getElementById('categoria_id').value;
             const preco = document.getElementById('preco').value;
+            
+            // --- CORREÇÃO NO JAVASCRIPT: O ID é 'prazo_execucao' ---
             const prazo = document.getElementById('prazo_execucao').value;
             
             if (!titulo || !descricao || !categoria || !preco || !prazo) {
@@ -656,4 +676,3 @@ try {
     </script>
 </body>
 </html>
-

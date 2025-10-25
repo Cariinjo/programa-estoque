@@ -1,9 +1,18 @@
 <?php
 // --- BLOCO PHP CORRIGIDO (com base no seu resumo) ---
+
+// --- NOVO: Inclui o config para ter acesso ao $pdo e às funções de sessão
+// (Ajuste o caminho se o seu header.php não estiver na raiz do site)
+require_once 'includes/config.php'; 
+
 $user_logged = isLoggedIn();
 $user_name = $user_logged ? $_SESSION['user_name'] : '';
 $user_type = $user_logged ? $_SESSION['user_type'] : '';
 $user_avatar = ''; // Inicia a variável
+
+// --- NOVO: Variáveis para Notificações ---
+$unread_count = 0;
+$notifications_list = [];
 
 // Lógica do Avatar (Seguindo o Resumo)
 if ($user_logged && !empty($_SESSION['user_id'])) {
@@ -11,20 +20,44 @@ if ($user_logged && !empty($_SESSION['user_id'])) {
     // 1. Pegar o user_id da sessão
     $user_id = $_SESSION['user_id'];
     
-    // 2. Construir o caminho do avatar conforme o resumo: uploads/perfis/{id}.png
-    $potential_avatar_path = "uploads/perfis/" . htmlspecialchars($user_id) . ".png"; // <-- CORREÇÃO
+    // 2. Construir o caminho do avatar
+    $potential_avatar_path = "uploads/perfis/" . htmlspecialchars($user_id) . ".png";
     
     // 3. Verificar se o arquivo realmente existe
     if (file_exists($potential_avatar_path)) {
         $user_avatar = $potential_avatar_path;
     } else {
         // Se o arquivo não existe, usa o default
-        $user_avatar = 'uploads/perfis/default.png'; // <-- CORREÇÃO
+        $user_avatar = 'uploads/perfis/default.png';
     }
+
+    // --- NOVO: Lógica para buscar notificações ---
+    try {
+        // 1. Contar notificações não lidas
+        $stmt_count = $pdo->prepare("SELECT COUNT(*) FROM notificacoes WHERE id_usuario_destino = ? AND lida = 0");
+        $stmt_count->execute([$user_id]);
+        $unread_count = $stmt_count->fetchColumn();
+        
+        // 2. Buscar as 5 últimas notificações
+        $stmt_list = $pdo->prepare("
+            SELECT tipo_notificacao, mensagem, link_acao, lida, data_criacao 
+            FROM notificacoes 
+            WHERE id_usuario_destino = ? 
+            ORDER BY data_criacao DESC 
+            LIMIT 5
+        ");
+        $stmt_list->execute([$user_id]);
+        $notifications_list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (Exception $e) {
+        // Em caso de erro de DB, não quebra a página
+        error_log("Erro ao buscar notificacoes: " . $e->getMessage());
+    }
+    // --- FIM DA LÓGICA DE NOTIFICAÇÕES ---
 
 } else {
     // 4. Usuário não logado, usa o default
-    $user_avatar = 'uploads/perfis/default.png'; // <-- CORREÇÃO
+    $user_avatar = 'uploads/perfis/default.png';
 }
 
 // Gerar iniciais do nome para avatar
@@ -34,6 +67,30 @@ if ($user_name) {
     $user_initials = strtoupper(substr($names[0], 0, 1));
     if (count($names) > 1) {
         $user_initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
+    }
+}
+
+// --- NOVO: Função para formatar o tempo ---
+function time_ago($datetime) {
+    if (!$datetime) {
+        return 'agora mesmo';
+    }
+    try {
+        $now = new DateTime;
+        $ago = new DateTime($datetime);
+        $diff = $now->diff($ago);
+        
+        $dias = $diff->d;
+        $horas = $diff->h;
+        $minutos = $diff->i;
+        
+        if ($dias > 0) return $dias . ' dia' . ($dias > 1 ? 's' : '') . ' atrás';
+        if ($horas > 0) return $horas . ' hora' . ($horas > 1 ? 's' : '') . ' atrás';
+        if ($minutos > 0) return $minutos . ' min' . ($minutos > 1 ? 's' : '') . ' atrás';
+        return 'agora mesmo';
+
+    } catch (Exception $e) {
+        return 'agora mesmo';
     }
 }
 // --- FIM DO BLOCO PHP CORRIGIDO ---
@@ -81,23 +138,21 @@ if ($user_name) {
         <div class="header-actions">
             <?php if ($user_logged): ?>
                 <div class="user-menu-container">
+                    
                     <div class="notification-btn" onclick="toggleNotifications()">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+                        <?php if ($unread_count > 0): ?>
+                            <span class="notification-badge" id="notification-badge"><?= $unread_count ?></span>
+                        <?php endif; ?>
                     </div>
-
                     <div class="user-menu" onclick="toggleUserMenu()">
                         <div class="user-avatar">
                             <?php 
                             // Esta lógica usa a variável $user_avatar corrigida.
-                            // Seu resumo não mencionava o uso de iniciais se a imagem existisse,
-                            // então esta lógica prioriza a imagem.
-                            // Se $user_avatar for uma string vazia (o que não deve acontecer com a lógica acima)
-                            // ele cairia no 'else'.
+                            // Prioriza a imagem; se não houver, usa iniciais.
                             ?>
-                            <?php if ($user_avatar): ?>
-                                <img src="<?= htmlspecialchars($user_avatar) ?>" alt="Avatar">
-                            <?php else: ?>
+                            <?php if ($user_avatar && $user_avatar !== 'uploads/perfis/default.png'): ?>
+                                <img src="<?= htmlspecialchars($user_avatar) ?>?v=<?= time() ?>" alt="Avatar"> <?php else: ?>
                                 <span class="avatar-initials"><?= $user_initials ?></span>
                             <?php endif; ?>
                         </div>
@@ -140,7 +195,7 @@ if ($user_name) {
                                 <i class="fas fa-file-invoice"></i>
                                 <span>Orçamentos</span>
                             </a>
-                        <?php else: ?>
+                        <?php else: // Cliente ?>
                             <a href="dashboard.php" class="dropdown-item">
                                 <i class="fas fa-user"></i>
                                 <span>Meu Perfil</span>
@@ -174,41 +229,46 @@ if ($user_name) {
                 <div class="notifications-panel" id="notifications-panel">
                     <div class="notifications-header">
                         <h3>Notificações</h3>
-                        <button class="mark-all-read">Marcar todas como lidas</button>
+                        <button class="mark-all-read" id="mark-all-read-btn">Marcar todas como lidas</button>
                     </div>
-                    <div class="notifications-list">
-                        <div class="notification-item unread">
-                            <div class="notification-icon">
-                                <i class="fas fa-file-invoice"></i>
+                    
+                    <div class="notifications-list" id="notifications-list">
+                        
+                        <?php if (empty($notifications_list)): ?>
+                            <div class="notification-item" style="justify-content: center; color: #777;">
+                                Nenhuma notificação encontrada.
                             </div>
-                            <div class="notification-content">
-                                <p>Novo orçamento recebido</p>
-                                <span class="notification-time">2 min atrás</span>
-                            </div>
-                        </div>
-                        <div class="notification-item">
-                            <div class="notification-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="notification-content">
-                                <p>Nova avaliação recebida</p>
-                                <span class="notification-time">1 hora atrás</span>
-                            </div>
-                        </div>
-                        <div class="notification-item">
-                            <div class="notification-icon">
-                                <i class="fas fa-message"></i>
-                            </div>
-                            <div class="notification-content">
-                                <p>Nova mensagem no chat</p>
-                                <span class="notification-time">3 horas atrás</span>
-                            </div>
-                        </div>
-                    </div>
+                        <?php else: ?>
+                            <?php foreach ($notifications_list as $notification): ?>
+                                <?php
+                                // Lógica para definir o ícone com base no 'tipo_notificacao'
+                                $icon = 'fas fa-bell'; // Padrão
+                                if ($notification['tipo_notificacao'] == 'orcamento_novo') {
+                                    $icon = 'fas fa-file-invoice';
+                                } elseif ($notification['tipo_notificacao'] == 'nova_avaliacao') {
+                                    $icon = 'fas fa-star';
+                                } elseif ($notification['tipo_notificacao'] == 'nova_mensagem') {
+                                    $icon = 'fas fa-message';
+                                }
+                                ?>
 
+                                <a href="<?= htmlspecialchars($notification['link_acao'] ?? '#') ?>" 
+                                   class="notification-item <?= !$notification['lida'] ? 'unread' : '' ?>">
+                                    
+                                    <div class="notification-icon">
+                                        <i class="<?= $icon ?>"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p><?= htmlspecialchars($notification['mensagem']) ?></p> 
+                                        <span class="notification-time"><?= time_ago($notification['data_criacao']) ?></span>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                    </div>
                 </div>
-
-            <?php else: ?>
+                <?php else: ?>
                 <div class="auth-buttons">
                     <a href="login.php" class="btn btn-outline">
                         <i class="fas fa-sign-in-alt"></i>
@@ -252,6 +312,8 @@ if ($user_name) {
 </header>
 
 <style>
+/* ... (TODO O SEU CSS VEM AQUI - Nenhuma alteração necessária) ... */
+
 /* HEADER MODERNO */
 .modern-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -434,6 +496,7 @@ if ($user_name) {
     transform: translateY(-10px);
     transition: all 0.3s ease;
     z-index: 1001;
+    margin-top: 8px; /* --- NOVO (ou ajuste) --- Adiciona espaço */
 }
 
 .register-menu.active {
@@ -546,6 +609,7 @@ if ($user_name) {
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3); /* --- NOVO (Opcional): Borda bonita */
 }
 
 .user-avatar img {
@@ -646,7 +710,7 @@ if ($user_name) {
 .notifications-panel {
     position: absolute;
     top: 100%;
-    right: 60px;
+    right: 60px; /* Ajustado para dar espaço ao menu do usuário */
     background: white;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -686,6 +750,11 @@ if ($user_name) {
     font-size: 0.8rem;
     cursor: pointer;
 }
+/* --- NOVO: Estilo do botão desabilitado --- */
+.mark-all-read:disabled {
+    color: #999;
+    cursor: default;
+}
 
 .notifications-list {
     max-height: 300px;
@@ -698,6 +767,12 @@ if ($user_name) {
     padding: 12px 16px;
     border-bottom: 1px solid #f5f5f5;
     transition: background 0.3s ease;
+    text-decoration: none; /* --- NOVO: Remove sublinhado do link --- */
+}
+
+/* --- NOVO: Garante que o item não tenha :hover estranho se for só texto --- */
+.notification-item:not(a) {
+    cursor: default;
 }
 
 .notification-item:hover {
@@ -724,7 +799,16 @@ if ($user_name) {
     margin: 0 0 4px 0;
     font-size: 0.9rem;
     color: #333;
+    line-height: 1.3; /* --- NOVO (Opcional): Melhora leitura --- */
 }
+
+.notification-content {
+     /* --- NOVO: Evita que texto vaze --- */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
 
 .notification-time {
     font-size: 0.8rem;
@@ -789,7 +873,7 @@ if ($user_name) {
     }
     
     .header-nav {
-        display: none;
+        display: none; /* --- NOVO: Adicionar lógica JS para 'toggleMobileMenu' para mostrar isso --- */
     }
     
     .mobile-menu-btn {
@@ -806,6 +890,10 @@ if ($user_name) {
     
     .auth-buttons .btn span {
         display: none;
+    }
+
+    .auth-buttons .btn {
+        padding: 10px 12px; /* --- NOVO: Ajuste para mobile --- */
     }
     
     .notifications-panel {
@@ -833,43 +921,50 @@ function toggleUserMenu() {
     const userMenu = document.querySelector('.user-menu');
     const overlay = document.getElementById('header-overlay');
     
+    // Fecha outros menus abertos
+    document.getElementById('register-menu')?.classList.remove('active');
+    document.getElementById('notifications-panel')?.classList.remove('active');
+
+    // Abre/fecha o menu do usuário
     dropdown.classList.toggle('active');
     userMenu.classList.toggle('active');
     overlay.classList.toggle('active');
-    
-    // Fechar outros menus
-    document.getElementById('register-menu')?.classList.remove('active');
-    document.getElementById('notifications-panel')?.classList.remove('active');
 }
 
 function toggleRegisterMenu() {
     const menu = document.getElementById('register-menu');
     const overlay = document.getElementById('header-overlay');
     
-    menu.classList.toggle('active');
-    overlay.classList.toggle('active');
-    
-    // Fechar outros menus
+    // Fecha outros menus abertos
     document.getElementById('user-dropdown')?.classList.remove('active');
     document.querySelector('.user-menu')?.classList.remove('active');
     document.getElementById('notifications-panel')?.classList.remove('active');
+
+    // Abre/fecha o menu de registro
+    menu.classList.toggle('active');
+    overlay.classList.toggle('active');
 }
 
 function toggleNotifications() {
     const panel = document.getElementById('notifications-panel');
     const overlay = document.getElementById('header-overlay');
     
-    panel.classList.toggle('active');
-    overlay.classList.toggle('active');
-    
-    // Fechar outros menus
+    // Fecha outros menus abertos
     document.getElementById('user-dropdown')?.classList.remove('active');
     document.querySelector('.user-menu')?.classList.remove('active');
     document.getElementById('register-menu')?.classList.remove('active');
+
+    // Abre/fecha o painel de notificações
+    panel.classList.toggle('active');
+    overlay.classList.toggle('active');
 }
 
 function toggleMobileMenu() {
-    // Implementar menu mobile
+    // --- NOVO: Implementação básica do menu mobile ---
+    const nav = document.getElementById('header-nav');
+    const overlay = document.getElementById('header-overlay');
+    nav.classList.toggle('active'); // Você precisará de CSS para .header-nav.active
+    overlay.classList.toggle('active');
     console.log('Mobile menu clicked');
 }
 
@@ -879,12 +974,15 @@ function closeAllMenus() {
     document.getElementById('register-menu')?.classList.remove('active');
     document.getElementById('notifications-panel')?.classList.remove('active');
     document.getElementById('header-overlay')?.classList.remove('active');
+    
+    // --- NOVO: Fecha menu mobile também ---
+    document.getElementById('header-nav')?.classList.remove('active');
 }
 
 // Fechar menus ao clicar fora
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.user-menu-container') && 
-        !e.target.closest('.register-dropdown')) {
+    // --- NOVO: Lógica de clique fora melhorada ---
+    if (e.target.id === 'header-overlay') {
         closeAllMenus();
     }
 });
@@ -895,5 +993,58 @@ document.addEventListener('keydown', function(e) {
         closeAllMenus();
     }
 });
+
+// --- NOVO: LÓGICA AJAX PARA NOTIFICAÇÕES ---
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const markAllReadBtn = document.getElementById('mark-all-read-btn');
+    
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function() {
+            
+            // 1. Chamar o arquivo PHP em segundo plano
+            // Ajuste o caminho se necessário
+            fetch('ajax_mark_all_read.php', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro de rede ou servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // 2. Atualizar a interface (UI)
+                    console.log('Notificações marcadas como lidas.');
+                    
+                    // Esconder o contador
+                    const badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                    
+                    // Remover o fundo azul de todos os itens
+                    const listItems = document.querySelectorAll('#notifications-list .notification-item.unread');
+                    listItems.forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    
+                    // Desabilitar o botão
+                    markAllReadBtn.textContent = 'Todas lidas';
+                    markAllReadBtn.disabled = true;
+
+                } else {
+                    console.error('Falha ao marcar como lidas:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição AJAX:', error);
+            });
+        });
+    }
+});
 </script>
-```
