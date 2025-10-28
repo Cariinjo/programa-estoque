@@ -64,11 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
         
         // --- CORREÇÃO 4: Atualizar o INSERT para usar 'tipo_servico' e 'cidade_id' ---
+        // (Removida a coluna 'status_servico' conforme seu erro anterior)
         $stmt = $pdo->prepare("
             INSERT INTO servicos (
                 id_profissional, id_categoria, titulo, descricao, preco, 
-                tempo_entrega, tipo_servico, status_servico, data_criacao, cidade_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ativo', NOW(), ?)
+                tempo_entrega, tipo_servico, data_criacao, cidade_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)
         ");
         
         $stmt->execute([
@@ -84,36 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $servico_id = $pdo->lastInsertId();
         
-        // Processar upload de imagens se enviadas
-        if (isset($_FILES['imagens']) && !empty($_FILES['imagens']['name'][0])) {
-            $upload_dir = 'uploads/servicos/';
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-            }
-            
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-            $max_files = 5;
-            
-            for ($i = 0; $i < min(count($_FILES['imagens']['name']), $max_files); $i++) {
-                if ($_FILES['imagens']['error'][$i] === UPLOAD_ERR_OK) {
-                    $file_extension = strtolower(pathinfo($_FILES['imagens']['name'][$i], PATHINFO_EXTENSION));
-                    
-                    if (in_array($file_extension, $allowed_extensions)) {
-                        $new_filename = 'servico_' . $servico_id . '_' . ($i + 1) . '_' . time() . '.' . $file_extension;
-                        $upload_path = $upload_dir . $new_filename;
-                        
-                        if (move_uploaded_file($_FILES['imagens']['tmp_name'][$i], $upload_path)) {
-                            // (Assumindo que sua tabela de imagens se chama 'servico_imagens')
-                            $stmt_img = $pdo->prepare("
-                                INSERT INTO servico_imagens (id_servico, caminho_imagem, ordem) 
-                                VALUES (?, ?, ?)
-                            ");
-                            $stmt_img->execute([$servico_id, $upload_path, $i + 1]);
-                        }
-                    }
-                }
-            }
-        }
+        // ##### Bloco de UPLOAD DE IMAGEM REMOVIDO DAQUI #####
         
         $pdo->commit();
         
@@ -271,89 +243,9 @@ try {
         .radio-option input[type="radio"] {
             width: auto;
         }
-        
-        .image-upload {
-            border: 2px dashed #e9ecef;
-            border-radius: 10px;
-            padding: 2rem;
-            text-align: center;
-            transition: border-color 0.3s ease;
-        }
-        
-        .image-upload:hover {
-            border-color: #3498db;
-        }
-        
-        .image-upload.dragover {
-            border-color: #3498db;
-            background: #f8f9fa;
-        }
-        
-        .upload-icon {
-            font-size: 3rem;
-            color: #adb5bd;
-            margin-bottom: 1rem;
-        }
-        
-        .upload-text {
-            color: #6c757d;
-            margin-bottom: 1rem;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .btn-upload {
-            background: #3498db;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s ease;
-        }
-        
-        .btn-upload:hover {
-            background: #2980b9;
-        }
-        
-        .preview-images {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .preview-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid #e9ecef;
-        }
-        
-        .preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .remove-image {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
+
+        /* CSS de upload de imagem foi removido */
+
         .form-actions {
             display: flex;
             gap: 1rem;
@@ -456,7 +348,7 @@ try {
                 </div>
             <?php endif; ?>
             
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST">
                 <div class="form-grid">
                     <div class="form-group form-group-full">
                         <label for="titulo">Título do Serviço <span class="required">*</span></label>
@@ -511,24 +403,6 @@ try {
                     <div class="help-text">Seja específico sobre o que está incluído e o que não está</div>
                 </div>
                 
-                <div class="form-group form-group-full">
-                    <label>Imagens do Serviço (opcional)</label>
-                    <div class="image-upload" id="imageUpload">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-text">
-                            Arraste e solte imagens aqui ou clique para selecionar
-                        </div>
-                        <button type="button" class="btn-upload" onclick="document.getElementById('imagens').click()">
-                            <i class="fas fa-plus"></i> Selecionar Imagens
-                        </button>
-                        <input type="file" id="imagens" name="imagens[]" multiple accept="image/*" class="file-input">
-                        <div class="help-text">Máximo 5 imagens. Formatos: JPG, PNG, GIF</div>
-                    </div>
-                    <div class="preview-images" id="previewImages"></div>
-                </div>
-                
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Cadastrar Serviço
@@ -542,92 +416,7 @@ try {
     </div>
     
     <script>
-        // Preview de imagens
-        const imageUpload = document.getElementById('imageUpload');
-        const imageInput = document.getElementById('imagens');
-        const previewContainer = document.getElementById('previewImages');
-        let selectedFiles = [];
-        
-        // Drag and drop
-        imageUpload.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            imageUpload.classList.add('dragover');
-        });
-        
-        imageUpload.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            imageUpload.classList.remove('dragover');
-        });
-        
-        imageUpload.addEventListener('drop', function(e) {
-            e.preventDefault();
-            imageUpload.classList.remove('dragover');
-            
-            const files = Array.from(e.dataTransfer.files);
-            handleFiles(files);
-        });
-        
-        imageInput.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            handleFiles(files);
-        });
-        
-        function handleFiles(files) {
-            const maxFiles = 5;
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            
-            files.forEach(file => {
-                if (selectedFiles.length >= maxFiles) {
-                    alert('Máximo de 5 imagens permitidas');
-                    return;
-                }
-                
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Formato não permitido: ' + file.name);
-                    return;
-                }
-                
-                selectedFiles.push(file);
-                createPreview(file, selectedFiles.length - 1);
-            });
-            
-            updateFileInput();
-        }
-        
-        function createPreview(file, index) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewItem = document.createElement('div');
-                previewItem.className = 'preview-item';
-                previewItem.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <button type="button" class="remove-image" onclick="removeImage(${index})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                previewContainer.appendChild(previewItem);
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function removeImage(index) {
-            selectedFiles.splice(index, 1);
-            previewContainer.innerHTML = '';
-            
-            selectedFiles.forEach((file, newIndex) => {
-                createPreview(file, newIndex);
-            });
-            
-            updateFileInput();
-        }
-        
-        function updateFileInput() {
-            const dt = new DataTransfer();
-            selectedFiles.forEach(file => {
-                dt.items.add(file);
-            });
-            imageInput.files = dt.files;
-        }
+        // ##### Bloco JAVASCRIPT de PREVIEW DE IMAGEM REMOVIDO DAQUI #####
         
         // Validação do formulário
         document.querySelector('form').addEventListener('submit', function(e) {

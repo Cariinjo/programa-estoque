@@ -48,19 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             UPDATE usuarios SET 
                 nome = ?, email = ?, telefone = ?, whatsapp = ?, 
-                endereco_completo = ?, cep = ?, cidade_id = ?
+                endereco_completo = ?, cep = ?, cidade_id = ?, experiencia_anos = ?
             WHERE id_usuario = ?
         ");
-        $stmt->execute([$nome, $email, $telefone, $whatsapp, $endereco_completo, $cep, $cidade_id, $user_id]);
+        $stmt->execute([$nome, $email, $telefone, $whatsapp, $endereco_completo, $cep, $cidade_id, $experiencia_anos, $user_id]);
         
         // Atualizar dados do profissional
         $stmt = $pdo->prepare("
             UPDATE profissionais SET 
                 area_atuacao = ?, descricao_perfil = ?, 
-                experiencia_anos = ?, disponibilidade = ?
+                experiencia_anos = ?, disponibilidade = ?, cidade_id = ?
             WHERE id_usuario = ?
         ");
-        $stmt->execute([$area_atuacao, $descricao_perfil, $experiencia_anos, $disponibilidade, $user_id]);
+        $stmt->execute([$area_atuacao, $descricao_perfil, $experiencia_anos, $disponibilidade, $cidade_id, $user_id]);
         
         // Processar upload de foto se enviada
         if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {

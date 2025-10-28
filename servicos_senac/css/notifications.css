@@ -1,0 +1,177 @@
+/* Estilos para o Dropdown de Notificações */
+.notifications-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.notifications-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 10px;
+    color: #fff; /* Ajuste a cor conforme seu header */
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.notifications-button:hover {
+    opacity: 0.8;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 2px;
+    background-color: #e74c3c; /* Vermelho */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 5px;
+    font-size: 0.7em;
+    line-height: 1;
+    font-weight: bold;
+    border: 1px solid white;
+    display: none; /* Escondido por padrão */
+}
+
+.notifications-content {
+    display: none; /* Escondido por padrão */
+    position: absolute;
+    right: 0;
+    top: calc(100% + 5px);
+    background-color: white;
+    min-width: 320px;
+    max-width: 400px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+/* Mostra/Esconde o dropdown adicionando/removendo a classe 'active' via JS */
+.notifications-dropdown.active .notifications-content {
+    display: block;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.notifications-header a { /* Link "Marcar Todas" */
+    font-size: 0.85em;
+    color: #6c5ce7; /* Roxo */
+    text-decoration: none;
+    font-weight: normal;
+    display: none; /* Escondido por padrão, mostrado via JS se houver não lidas */
+}
+.notifications-header a:hover {
+    text-decoration: underline;
+}
+.notifications-header a i {
+    margin-right: 3px;
+}
+
+.notifications-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.notification-item a {
+    display: flex; /* Alinha ícone e texto */
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    color: #333; /* Cor padrão do link */
+}
+.notification-item:last-child a {
+    border-bottom: none;
+}
+.notification-item a:hover {
+    background-color: #f0f0f7; /* Roxo bem claro no hover */
+}
+
+.notification-item a i { /* Estilo para o ícone */
+    margin-right: 10px;
+    opacity: 0.7;
+    width: 16px; /* Largura fixa para alinhamento */
+    text-align: center;
+}
+
+.notification-item a div { /* Container para mensagem e tempo */
+    flex-grow: 1;
+}
+
+.notification-item .message {
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    font-size: 0.85em;
+    word-break: break-word; /* Quebra palavras longas */
+}
+
+.notification-item .time {
+    display: block;
+    font-size: 0.75em;
+    color: #888;
+}
+
+/* Estilo NÃO LIDA */
+.notification-item.unread {
+    background-color: #f0f0f7; /* Roxo bem claro */
+}
+.notification-item.unread a {
+     color: #333;
+}
+.notification-item.unread .message {
+    font-weight: 600; /* Negrito */
+}
+
+/* Estilo LIDA */
+.notification-item.read {
+    background-color: #fff;
+    opacity: 0.8; /* Levemente apagada */
+}
+.notification-item.read a {
+     color: #555;
+}
+.notification-item.read .message {
+    font-weight: normal;
+}
+
+.no-notifications {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 0.9em;
+    list-style: none; /* Remove marcador se for li */
+}
+
+.notifications-footer {
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    text-align: center;
+    border-top: 1px solid #eee;
+    display: none; /* Escondido por padrão */
+}
+.notifications-footer a {
+    color: #6c5ce7;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+.notifications-footer a:hover {
+    text-decoration: underline;
+}
