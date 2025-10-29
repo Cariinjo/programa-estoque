@@ -515,7 +515,7 @@ try {
                             
                             <!-- Ações -->
                             <div class="servico-actions">
-                                <a href="editar-servico.php?id=<?= $servico['id_servico'] ?>" class="btn btn-primary">
+                                <a href="admin/editar-servico.php?id=<?= $servico['id_servico'] ?>" class="btn btn-primary">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
                                 

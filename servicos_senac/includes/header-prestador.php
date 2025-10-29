@@ -38,7 +38,7 @@ try {
                     <i class="fas fa-tools"></i>
                 </div>
                 <div class="brand-text">
-                    <span class="brand-name">SENAC</span>
+                    <span class="brand-name">SOS</span>
                     <span class="brand-subtitle">Prestador</span>
                 </div>
             </a>
@@ -58,12 +58,12 @@ try {
                     <span class="nav-text">Meus Serviços</span>
                 </a>
                 
-                <a href="historico-servicos.php" class="nav-item" data-tooltip="Histórico de serviços realizados">
+                <a href="historico-prestador.php" class="nav-item" data-tooltip="Histórico de serviços realizados">
                     <i class="fas fa-history"></i>
                     <span class="nav-text">Histórico</span>
                 </a>
                 
-                <a href="suporte.php" class="nav-item" data-tooltip="Central de suporte">
+                <a href="ajuda-prestador.php" class="nav-item" data-tooltip="Central de suporte">
                     <i class="fas fa-headset"></i>
                     <span class="nav-text">Suporte</span>
                 </a>
@@ -184,7 +184,7 @@ try {
                     <i class="fas fa-cogs"></i>
                     <span>Meus Serviços</span>
                 </a>
-                <a href="historico-servicos.php" class="mobile-nav-item">
+                <a href="historico-prestador.php" class="mobile-nav-item">
                     <i class="fas fa-history"></i>
                     <span>Histórico</span>
                 </a>

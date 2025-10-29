@@ -440,7 +440,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="contact-details">
                             <h4>Endereço</h4>
-                            <p>Rua SENAC, 123<br>Centro - São Paulo/SP<br>CEP: 01234-567</p>
+                            <p>SENAC SÃO JOAO DEL REI, 123<br>Centro<br>CEP: 36300-000</p>
                         </div>
                     </div>
                     
@@ -450,7 +450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="contact-details">
                             <h4>Telefone</h4>
-                            <p>(11) 1234-5678<br>(11) 98765-4321</p>
+                            <p>(32) 98431-4926<br>(32) 98765-4321</p>
                         </div>
                     </div>
                     

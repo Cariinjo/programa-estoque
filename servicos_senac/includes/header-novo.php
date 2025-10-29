@@ -25,7 +25,7 @@ if ($user_name) {
                     <i class="fas fa-graduation-cap"></i>
                 </div>
                 <div class="brand-text">
-                    <span class="brand-name">SENAC</span>
+                    <span class="brand-name">SOS</span>
                     <span class="brand-subtitle">Minas Gerais</span>
                 </div>
             </a>

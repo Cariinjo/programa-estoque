@@ -35,9 +35,9 @@
             <div class="footer-section">
                 <h4>Contato</h4>
                 <div class="contact-info">
-                    <p><i class="fas fa-phone"></i> (11) 1234-5678</p>
+                    <p><i class="fas fa-phone"></i> (32) 98431-4926</p>
                     <p><i class="fas fa-envelope"></i> contato@servicossenac.com.br</p>
-                    <p><i class="fas fa-map-marker-alt"></i> São Paulo, SP</p>
+                    <p><i class="fas fa-map-marker-alt"></i> São João Del Rei, MG</p>
                 </div>
             </div>
         </div>

@@ -59,7 +59,7 @@ if ($user_logged && $user_type === 'prestador') {
                     <i class="fas fa-briefcase"></i>
                 </div>
                 <div class="brand-text">
-                    <span class="brand-name">SENAC</span>
+                    <span class="brand-name">SOS</span>
                     <span class="brand-subtitle">Prestador</span>
                 </div>
             </a>
